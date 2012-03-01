@@ -1,0 +1,11 @@
+{
+    "server": "irc.freenode.net",
+    "port": "6667",
+    "nick": "mutalirc",
+    "owner": "guidj0s",
+    "operators": {
+	"guidj0s": "test"
+    },
+    "version": "1.0",
+    "channels": ["#guidj0s"]
+}
