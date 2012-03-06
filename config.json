@@ -7,5 +7,6 @@
 	"guidj0s": "test"
     },
     "version": "1.0",
-    "channels": ["#guidj0s"]
+    "channels": ["#guidj0s"],
+    "ignore": ["punk", "phunk"]
 }

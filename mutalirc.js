@@ -2,12 +2,19 @@ var nwk = require('./network.js'),
     cfg = require('./config.js'),
     cmd = require('./commands.js'),
     irc = require('./irc.js'),
-    opt;
+    opt,
+    ignored = {};
 
 
 function init(options) {
+
     opt = options;
-    nwk.connect(options, react);
+    
+    nwk.connect(opt, react);
+}
+
+function isIgnored(nickOrHostmask) {
+    return ignored[nickOrHostmask] !== 'undefined';
 }
 
 
@@ -17,6 +24,10 @@ function react(data) {
 	queries = irc.inbound,
 	resp    = irc.outbound,
 	success;
+
+    opt.ignore.forEach(function (nickOrHostmask) {
+	ignored[nickOrHostmask] = true;
+    });
 
     // The below looks terrible. I'm thinking of alternatives
     // and open to receiving suggestions. I got to the following 
@@ -59,7 +70,12 @@ function react(data) {
 
 
 function handlePrivate(packet) {
-    // console.log('<' + packet.sender + '> ' + packet.message);
+
+    if (isIgnored(packet.sender) || isIgnored(packet.hostmask)) {
+	console.log('Ignoring query from ' + packet.hostmask);
+	return;
+    }
+
     packet.network = nwk;
     packet.options = opt;
     cmd.runPrivate(packet);
@@ -68,13 +84,16 @@ function handlePrivate(packet) {
 
 function handlePublic(packet) {
 
+    if (isIgnored(packet.sender) || isIgnored(packet.hostmask)) {
+	console.log('Ignoring message from ' + packet.hostmask +
+		    ' on ' + packet.channel);
+	return;
+    }
+
     if (packet.message.match(cmd.cmdre) !== null) {
 	packet.network = nwk;
 	cmd.runPublic(packet);
     }
-
-    // console.log(packet.channel + ' <' + packet.sender +
-    //		'> ' + packet.message);
 
 }
 
