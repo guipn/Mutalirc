@@ -4,18 +4,25 @@ var irc      = require('./irc.js'),
 
 cmd.cmdre = /^\./;
 
+
+
 function ensureOp(hostmask) {
     if (typeof authdOps[hostmask] === 'undefined') {
 	throw { message: hostmask + ' is not authentified as an operator.' };
     }
 }
 
+function tokenize(msg) {
+    return msg.slice(1).split(/\s/);
+}
+
+
 
 // { sender, hostmask, message, network, options }
 
 cmd.runPrivate = function (packet) {
     
-    var tokens = packet.message.slice(1).split(/\s/),
+    var tokens = tokenize(packet.message),
 	name   = tokens[0];
 
     switch (name) {
@@ -49,7 +56,7 @@ cmd.runPrivate = function (packet) {
 
 cmd.runPublic = function (packet) {
 
-    var tokens = packet.message.slice(1).split(/\s/),
+    var tokens = tokenize(packet.message),
 	name   = tokens[0];
 
     switch (name) {
