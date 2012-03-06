@@ -7,14 +7,12 @@ var nwk = require('./network.js'),
 
 
 function init(options) {
-
     opt = options;
-    
     nwk.connect(opt, react);
 }
 
 function isIgnored(nickOrHostmask) {
-    return ignored[nickOrHostmask] !== 'undefined';
+    return typeof ignored[nickOrHostmask] !== 'undefined';
 }
 
 
