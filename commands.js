@@ -33,6 +33,13 @@ cmd.runPrivate = function (packet) {
 			   network:   packet.network,
 			   operators: packet.options.operators
 		       }); break;
+
+	case 'quit':   quit({
+		           who:      packet.sender,
+			   hostmask: packet.hostmask,
+			   network:  packet.network,
+			   message:  tokens[1]
+		       }); break;
     }
 
 }
@@ -53,8 +60,36 @@ cmd.runPublic = function (packet) {
 			  where:    packet.channel,
 			  network:  packet.network
 		      }); break;
+
+	case 'quit':   quit({
+		           who:      packet.sender,
+			   hostmask: packet.hostmask,
+			   network:  packet.network,
+			   message:  tokens[1]
+		       }); break;
     }
 };
+
+
+// { who, hostmask, network }
+
+function quit(config) {
+
+
+    var quitmsg = config.message || "";
+    console.log(irc.outbound.quit(quitmsg));
+
+    try {
+	ensureOp(config.hostmask);
+	console.log('Quitting by order of ' + config.who);
+	config.network.send(irc.outbound.quit(quitmsg));
+	process.exit();
+    }
+    catch (e) {
+    console.log(e.message);
+    }
+
+}
 
 
 

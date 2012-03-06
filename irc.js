@@ -56,6 +56,10 @@ irc.outbound = {
     version: function (requester, version) {
 		 return 'NOTICE ' + requester + ' :VERSION ' +
 			version   + '\r\n';
+	     },
+
+    quit:    function (msg) {
+		 return 'QUIT :' + msg + '\r\n';
 	     }
 
 };
