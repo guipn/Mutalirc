@@ -28,7 +28,7 @@ cmd.dispatch = function (packet, dispatcher) {
 	dispatcher[name].call(null, tokens, packet);
     }
 
-}
+};
 
 
 cmd.pub.quit = cmd.priv.quit = function (tokens, packet) {
@@ -45,7 +45,7 @@ cmd.pub.quit = cmd.priv.quit = function (tokens, packet) {
 	console.log(e.message);
     }
 
-}
+};
 
 
 cmd.priv.auth = function (tokens, packet) {
@@ -61,4 +61,4 @@ cmd.priv.auth = function (tokens, packet) {
 	authdOps[packet.hostmask] = true;
 	packet.network.send(irc.outbound.say(packet.sender, 'You are now authentified.'));
     }
-}
+};
