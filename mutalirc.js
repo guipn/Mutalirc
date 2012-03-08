@@ -76,7 +76,7 @@ function handlePrivate(packet) {
 
     packet.network = nwk;
     packet.options = opt;
-    cmd.runPrivate(packet);
+    cmd.dispatch(packet, cmd.priv);
 }
 
 
@@ -88,10 +88,8 @@ function handlePublic(packet) {
 	return;
     }
 
-    if (packet.message.match(cmd.prefix) !== null) {
-	packet.network = nwk;
-	cmd.runPublic(packet);
-    }
+    packet.network = nwk;
+    cmd.dispatch(packet, cmd.pub);
 
 }
 

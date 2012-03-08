@@ -1,8 +1,10 @@
-var irc      = require('./irc.js'),
-    cmd      = exports,
-    authdOps = {};
+var irc         = require('./irc.js'),
+    cmd         = exports,
+    authdOps    = {};
 
 cmd.prefix = /^\./;
+cmd.pub    = {};
+cmd.priv   = {};
 
 
 
@@ -17,119 +19,46 @@ function tokenize(msg) {
 }
 
 
-
-// { sender, hostmask, message, network, options }
-
-cmd.runPrivate = function (packet) {
+cmd.dispatch = function (packet, dispatcher) {
     
     var tokens = tokenize(packet.message),
 	name   = tokens[0];
 
-    switch (name) {
-
-	case 'greet':  greet({
-			  isPublic: false,
-			  who:      packet.sender,
-			  network:  packet.network
-		      }); break;
-
-	case 'auth':   auth({
-			   who:       packet.sender,
-			   hostmask:  packet.hostmask,
-			   pwTry:     tokens[1],
-			   network:   packet.network,
-			   operators: packet.options.operators
-		       }); break;
-
-	case 'quit':   quit({
-		           who:      packet.sender,
-			   hostmask: packet.hostmask,
-			   network:  packet.network,
-			   message:  tokens[1]
-		       }); break;
+    if (typeof dispatcher[name] !== 'undefined') {
+	dispatcher[name].call(null, tokens, packet);
     }
 
 }
 
 
-// { sender, hostmask, message, network }
+cmd.pub.quit = cmd.priv.quit = function (tokens, packet) {
 
-cmd.runPublic = function (packet) {
-
-    var tokens = tokenize(packet.message),
-	name   = tokens[0];
-
-    switch (name) {
-
-	case 'greet': greet({
-			  isPublic: true,
-			  who:      packet.sender,
-			  where:    packet.channel,
-			  network:  packet.network
-		      }); break;
-
-	case 'quit':   quit({
-		           who:      packet.sender,
-			   hostmask: packet.hostmask,
-			   network:  packet.network,
-			   message:  tokens[1]
-		       }); break;
-    }
-};
-
-
-// { who, hostmask, network }
-
-function quit(config) {
-
-
-    var quitmsg = config.message || "";
-    console.log(irc.outbound.quit(quitmsg));
+    var quitmsg = tokens[1] || "";
 
     try {
-	ensureOp(config.hostmask);
-	console.log('Quitting by order of ' + config.who);
-	config.network.send(irc.outbound.quit(quitmsg));
+	ensureOp(packet.hostmask);
+	console.log('Quitting by order of ' + packet.sender);
+	packet.network.send(irc.outbound.quit(quitmsg));
 	process.exit();
     }
     catch (e) {
-    console.log(e.message);
+	console.log(e.message);
     }
 
 }
 
 
-
-// { isPublic, who, where, network }
-
-function greet(config) {
-
-    var message;
+cmd.priv.auth = function (tokens, packet) {
     
-    if (config.isPublic) {
-	message = config.who + ': Hello.';
-	config.network.send(irc.outbound.say(config.where, message));
-    } 
-    else {
-	message = 'Hello.';
-	config.network.send(irc.outbound.say(config.who, message));
-    }
-}
-
-
-// { who, hostmask, pwTry, network, operators }
-
-function auth(config) {
-    
-    if (typeof config.operators[config.who] === 'undefined') {
+    if (typeof packet.options.operators[packet.sender] === 'undefined') {
 	return;
     }
     
-    if (config.operators[config.who] !== config.pwTry) {
-	config.network.send(irc.outbound.say(config.who, 'Invalid password.'));
+    if (packet.options.operators[packet.sender] !== tokens[1]) {
+	config.network.send(irc.outbound.say(packet.sender, 'Invalid password.'));
     }
     else {
-	authdOps[config.hostmask] = true;
-	config.network.send(irc.outbound.say(config.who, 'You are now authentified.'));
+	authdOps[packet.hostmask] = true;
+	packet.network.send(irc.outbound.say(packet.sender, 'You are now authentified.'));
     }
 }
