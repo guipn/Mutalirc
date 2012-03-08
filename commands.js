@@ -25,7 +25,7 @@ cmd.dispatch = function (packet, dispatcher) {
 	name   = tokens[0];
 
     if (typeof dispatcher[name] !== 'undefined') {
-	dispatcher[name].call(null, tokens, packet);
+	dispatcher[name](tokens, packet);
     }
 
 };
