@@ -88,7 +88,7 @@ function handlePublic(packet) {
 	return;
     }
 
-    if (packet.message.match(cmd.cmdre) !== null) {
+    if (packet.message.match(cmd.prefix) !== null) {
 	packet.network = nwk;
 	cmd.runPublic(packet);
     }

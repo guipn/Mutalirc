@@ -2,7 +2,7 @@ var irc      = require('./irc.js'),
     cmd      = exports,
     authdOps = {};
 
-cmd.cmdre = /^\./;
+cmd.prefix = /^\./;
 
 
 
