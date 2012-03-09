@@ -10,6 +10,7 @@ cmd.priv   = {};
 
 function ensureOp(hostmask) {
     if (typeof authdOps[hostmask] === 'undefined') {
+    	// throwing is horrible. Need to make this better.
 	throw { message: hostmask + ' is not authentified as an operator.' };
     }
 }
