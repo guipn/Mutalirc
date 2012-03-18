@@ -1,6 +1,7 @@
-var irc         = require('./irc.js'),
-    cmd         = exports,
-    authdOps    = {};
+var irc      = require('./irc.js'),
+    gbk      = require('./gbooks.js'),
+    cmd      = exports,
+    authdOps = {};
 
 cmd.prefix = /^\./;
 cmd.pub    = {};
@@ -8,14 +9,16 @@ cmd.priv   = {};
 
 
 
-function ensureOp(hostmask) {
-    if (typeof authdOps[hostmask] === 'undefined') {
-	throw { message: hostmask + ' is not authentified as an operator.' };
-    }
+function notSuperUser(hostmask) {
+
+    return typeof authdOps[hostmask] !== 'undefined';
+    
 }
 
 function tokenize(msg) {
+
     return msg.slice(1).split(/\s/);
+
 }
 
 
@@ -30,22 +33,6 @@ cmd.dispatch = function (packet, dispatcher) {
 
 };
 
-
-cmd.pub.quit = cmd.priv.quit = function (tokens, packet) {
-
-    var quitmsg = tokens[1] || "";
-
-    try {
-	ensureOp(packet.hostmask);
-	console.log('Quitting by order of ' + packet.sender);
-	packet.network.send(irc.outbound.quit(quitmsg));
-	process.exit();
-    }
-    catch (e) {
-	console.log(e.message);
-    }
-
-};
 
 
 cmd.priv.auth = function (tokens, packet) {
@@ -62,3 +49,50 @@ cmd.priv.auth = function (tokens, packet) {
 	packet.network.send(irc.outbound.say(packet.sender, 'You are now authentified.'));
     }
 };
+
+
+cmd.pub.gbooks = function (tokens, packet) {
+
+    var opt = packet.options;
+
+    if (notSuperUser(packet.hostmask)) {
+	return;
+    }
+
+    tokens.shift();
+
+    gbk.getAPIKey(opt.gBooksAPIKey, function (key) {
+	console.log('Api key: ' + key);
+	gbk.search(key, tokens.join(' '), function (book) {
+	    var msg = book ? 
+			'"'        + book.title                 + '"' +
+			' - '      + book.authors.join(', ')          +
+			'; '       + book.pageCount      + ' pages; ' +
+			'Rating: ' + book.avgRating                   +
+			' ('       + book.ratingsCount + ' ratings).' +
+			' '        + book.link + '.' 
+			: 'No results found on Google Books.';
+
+	    packet.network.send(
+		irc.outbound.say(packet.channel, packet.sender + ': ' + msg)
+	    );
+	});
+    });
+
+};
+
+
+cmd.pub.quit = cmd.priv.quit = function (tokens, packet) {
+
+    if (notSuperUser(packet.hostmask)) {
+	return;
+    }
+
+    var quitmsg = tokens[1] || "";
+
+    console.log('Quitting by order of ' + packet.sender);
+    packet.network.send(irc.outbound.quit(quitmsg));
+    process.exit();
+    console.log(e.message);
+};
+

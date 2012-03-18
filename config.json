@@ -8,5 +8,6 @@
     },
     "version": "1.0",
     "channels": ["#guidj0s"],
+    "gBooksAPIKey": "gbk",
     "ignore": ["punk", "phunk"]
 }

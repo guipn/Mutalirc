@@ -89,6 +89,7 @@ function handlePublic(packet) {
     }
 
     packet.network = nwk;
+    packet.options = opt;
     cmd.dispatch(packet, cmd.pub);
 
 }
