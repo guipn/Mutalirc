@@ -76,6 +76,7 @@ function handlePrivate(packet) {
 
     packet.network = nwk;
     packet.options = opt;
+
     cmd.dispatch(packet, cmd.priv);
 }
 
@@ -90,6 +91,7 @@ function handlePublic(packet) {
 
     packet.network = nwk;
     packet.options = opt;
+    
     cmd.dispatch(packet, cmd.pub);
 
 }

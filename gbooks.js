@@ -54,11 +54,9 @@ gbooks.search = function (APIKey, query, callback) {
 	    host:   'www.googleapis.com',
 	    method: 'GET',
 	    path:   '/books/v1/volumes?q=' + qArg +
-		    '&key=' + APIKey + 
+		    '&key='                + APIKey + 
 		    '&maxResults=1&printType=books&filter=partial'
 	};
-
-    console.log('https://' + options.host + options.path);
 
     var request = https.request(options, function (response) {
 	response.setEncoding('utf8');
@@ -71,5 +69,4 @@ gbooks.search = function (APIKey, query, callback) {
     });
 
     request.end();
-
 };

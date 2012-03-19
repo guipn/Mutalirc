@@ -11,7 +11,7 @@ cmd.priv   = {};
 
 function notSuperUser(hostmask) {
 
-    return typeof authdOps[hostmask] !== 'undefined';
+    return typeof authdOps[hostmask] === 'undefined';
     
 }
 
@@ -36,17 +36,25 @@ cmd.dispatch = function (packet, dispatcher) {
 
 
 cmd.priv.auth = function (tokens, packet) {
+
+    var correctPass = packet.options.operators[packet.sender];
     
-    if (typeof packet.options.operators[packet.sender] === 'undefined') {
+    if (typeof packet.options.
+		operators[packet.sender] === 'undefined') {
 	return;
     }
     
-    if (packet.options.operators[packet.sender] !== tokens[1]) {
-	config.network.send(irc.outbound.say(packet.sender, 'Invalid password.'));
+    if (tokens[1] !== correctPass) {
+	config.network.send(
+	    irc.outbound.say(packet.sender, 'Invalid password.')
+	);
     }
     else {
 	authdOps[packet.hostmask] = true;
-	packet.network.send(irc.outbound.say(packet.sender, 'You are now authentified.'));
+
+	packet.network.send(
+	    irc.outbound.say(packet.sender, 'You are now authentified.')
+	);
     }
 };
 
@@ -55,6 +63,21 @@ cmd.pub.gbooks = function (tokens, packet) {
 
     var opt = packet.options;
 
+    function sendBookResult(book) {
+	var msg = book ? 
+		'"'        + book.title                 + '"' +
+		' - '      + book.authors.join(', ')          +
+		'; '       + book.pageCount      + ' pages; ' +
+		'Rating: ' + book.avgRating                   +
+		' ('       + book.ratingsCount + ' ratings).' +
+		' '        + book.link + '.' 
+		: 'No results found on Google Books.';
+
+	packet.network.send(
+	    irc.outbound.say(packet.channel, packet.sender + ': ' + msg)
+	);	
+    }
+
     if (notSuperUser(packet.hostmask)) {
 	return;
     }
@@ -62,21 +85,7 @@ cmd.pub.gbooks = function (tokens, packet) {
     tokens.shift();
 
     gbk.getAPIKey(opt.gBooksAPIKey, function (key) {
-	console.log('Api key: ' + key);
-	gbk.search(key, tokens.join(' '), function (book) {
-	    var msg = book ? 
-			'"'        + book.title                 + '"' +
-			' - '      + book.authors.join(', ')          +
-			'; '       + book.pageCount      + ' pages; ' +
-			'Rating: ' + book.avgRating                   +
-			' ('       + book.ratingsCount + ' ratings).' +
-			' '        + book.link + '.' 
-			: 'No results found on Google Books.';
-
-	    packet.network.send(
-		irc.outbound.say(packet.channel, packet.sender + ': ' + msg)
-	    );
-	});
+	gbk.search(key, tokens.join(' '), sendBookResult);
     });
 
 };
