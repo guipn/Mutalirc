@@ -7,15 +7,23 @@ var nwk = require('./network.js'),
     ignored = {};
 
 
-function init(options) {
-    opt = options;
-    nwk.connect(opt, react);
-}
+// Entry point
+cfg.read(init);
 
-function isIgnored(nickOrHostmask) {
+
+function ignoring(nickOrHostmask) {
     return typeof ignored[nickOrHostmask] !== 'undefined';
 }
 
+function init(options) {
+    opt = options;
+
+    opt.ignore.forEach(function (nickOrHostmask) {
+	ignored[nickOrHostmask] = true;
+    });
+ 
+    nwk.connect(opt, react);
+}
 
 function react(data) {
 
@@ -23,10 +31,6 @@ function react(data) {
 	queries = irc.inbound,
 	resp    = irc.outbound,
 	success;
-
-    opt.ignore.forEach(function (nickOrHostmask) {
-	ignored[nickOrHostmask] = true;
-    });
 
     // The below looks terrible. I'm thinking of alternatives
     // and open to receiving suggestions. I got to the following 
@@ -70,7 +74,7 @@ function react(data) {
 
 function handlePrivate(packet) {
 
-    if (isIgnored(packet.sender) || isIgnored(packet.hostmask)) {
+    if (ignoring(packet.sender) || ignoring(packet.hostmask)) {
 	console.log('Ignoring query from ' + packet.hostmask);
 	return;
     }
@@ -85,7 +89,7 @@ function handlePrivate(packet) {
 
 function handlePublic(packet) {
 
-    if (isIgnored(packet.sender) || isIgnored(packet.hostmask)) {
+    if (ignoring(packet.sender) || ignoring(packet.hostmask)) {
 	console.log(utl.interp('Ignoring message from {hmask} on {chan}.',
 			       {
 				   hmask: packet.hostmask,
@@ -101,6 +105,3 @@ function handlePublic(packet) {
     cmd.dispatch(packet, cmd.pub);
 
 }
-
-// Entry point
-cfg.read(init);
