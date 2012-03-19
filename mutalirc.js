@@ -31,15 +31,6 @@ function react(data) {
 	resp    = irc.outbound,
 	success;
 
-    // The below looks terrible. I'm thinking of alternatives
-    // and open to receiving suggestions. I got to the following 
-    // but found it to be cumbersome:
-    //
-    // (success = text.match(queries.ping())) &&
-    // (function () { nwk.send(resp.ping(success[1]); }());
-    // 
-    // ...
-
     if ( success = text.match(queries.ping()) ) {
 
 	nwk.send(resp.ping(success[1])); 
@@ -50,18 +41,18 @@ function react(data) {
 
     } else if ( success = text.match(queries.privmsg(opt.nick)) ) {
 
-	handleMessage({
+	handleMessage(cmd.prv, {
 	    sender:   success[1],
 	    hostmask: success[2],
 	    message:  success[3],
 	    network:  nwk,
 	    options:  opt,
 	    ignored:  ignored
-	}, cmd.prv);
+	});
 
     } else if ( success = text.match(queries.publicmsg()) ) {
 
-	handleMessage({
+	handleMessage(cmd.pub, {
 	    sender:   success[1],
 	    hostmask: success[2],
 	    channel:  success[3],
@@ -69,7 +60,7 @@ function react(data) {
 	    network:  nwk,
 	    options:  opt,
 	    ignored:  ignored
-	}, cmd.pub);
+	});
 
     } 
 
@@ -77,13 +68,13 @@ function react(data) {
 }
 
 
-function handleMessage(packet, dispatcher) {
+function handleMessage(dispatcher, packet) {
 
     if (ignoring(packet.sender) || ignoring(packet.hostmask)) {
 	console.log('Ignoring query from ' + packet.hostmask);
 	return;
     }
     
-    cmd.dispatch(packet, dispatcher); 
+    cmd.dispatch(dispatcher, packet); 
 }
 
