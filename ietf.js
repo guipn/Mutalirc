@@ -20,7 +20,8 @@ rfc.search = function (query, callback) {
 		html += data;
 	    });
 	    response.on('end', function() {
-		callback(html.match(link)[1]);
+		var result = html.match(link);
+		callback(result ? result[1] : 'No results found.');
 	    });
 	});
 
