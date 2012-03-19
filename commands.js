@@ -1,5 +1,6 @@
 var irc      = require('./irc.js'),
     gbk      = require('./gbooks.js'),
+    rfc      = require('./ietf.js'),
     utl      = require('./util.js'),
     cmd      = exports,
     authd    = {}; // People authentified
@@ -95,6 +96,41 @@ cmd.pub.gbooks = function (tokens, packet) {
 };
 
 cmd.pub.gbooks.restricted = true;
+
+
+
+cmd.pub.rfc = function(tokens, packet) {
+    
+    tokens.shift();
+    rfc.search(tokens.join(' '), function (link) {
+
+	var msg = utl.interp('{who}: {lnk}',
+			     {
+				 who: packet.sender,
+				 lnk: link
+			     });
+
+	packet.network.send(
+	    irc.outbound.say(packet.channel, msg)
+	);
+    });
+};
+
+cmd.pub.rfc.restricted = false;
+
+
+
+cmd.priv.rfc = function(tokens, packet) {
+    
+    tokens.shift();
+    rfc.search(tokens.join(' '), function (link) {
+	packet.network.send(
+	    irc.outbound.say(packet.sender, link)
+	);
+    });
+};
+
+cmd.priv.rfc.restricted = false;
 
 
 
