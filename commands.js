@@ -2,19 +2,12 @@ var irc      = require('./irc.js'),
     gbk      = require('./gbooks.js'),
     utl      = require('./util.js'),
     cmd      = exports,
-    authdOps = {};
+    authd    = {}; // People authentified
 
 cmd.prefix = /^\./;
 cmd.pub    = {};
 cmd.priv   = {};
 
-
-
-function notSuperUser(hostmask) {
-
-    return typeof authdOps[hostmask] === 'undefined';
-    
-}
 
 function tokenize(msg) {
 
@@ -27,8 +20,15 @@ cmd.dispatch = function (packet, dispatcher) {
     
     var tokens = tokenize(packet.message),
 	name   = tokens[0];
+    
+    if (typeof dispatcher[name] === 'undefined') {
+	return;
+    }
 
-    if (typeof dispatcher[name] !== 'undefined') {
+    if (dispatcher[name].restricted === false) {
+	dispatcher[name](tokens, packet);
+    } 
+    else if (typeof authd[packet.hostmask] !== 'undefined') {
 	dispatcher[name](tokens, packet);
     }
 
@@ -51,13 +51,16 @@ cmd.priv.auth = function (tokens, packet) {
 	);
     }
     else {
-	authdOps[packet.hostmask] = true;
+	authd[packet.hostmask] = true;
 
 	packet.network.send(
 	    irc.outbound.say(packet.sender, 'You are now authentified.')
 	);
     }
 };
+
+cmd.priv.auth.restricted = false;
+
 
 
 cmd.pub.gbooks = function (tokens, packet) {
@@ -83,10 +86,6 @@ cmd.pub.gbooks = function (tokens, packet) {
 	);	
     }
 
-    if (notSuperUser(packet.hostmask)) {
-	return;
-    }
-
     tokens.shift();
 
     gbk.getAPIKey(opt.gBooksAPIKey, function (key) {
@@ -95,12 +94,11 @@ cmd.pub.gbooks = function (tokens, packet) {
 
 };
 
+cmd.pub.gbooks.restricted = true;
+
+
 
 cmd.pub.quit = cmd.priv.quit = function (tokens, packet) {
-
-    if (notSuperUser(packet.hostmask)) {
-	return;
-    }
 
     var quitmsg = tokens[1] || "";
 
@@ -110,21 +108,22 @@ cmd.pub.quit = cmd.priv.quit = function (tokens, packet) {
     console.log(e.message);
 };
 
-cmd.pub.join = cmd.priv.join = function (tokens, packet) {
+cmd.pub.quit.restricted = true;
 
-    if (notSuperUser(packet.hostmask)) {
-	return;
-    }
+
+
+cmd.pub.join = cmd.priv.join = function (tokens, packet) {
 
     packet.network.send(irc.outbound.join(tokens[1]));
 
 };
 
-cmd.pub.part = cmd.priv.part = function (tokens, packet) {
+cmd.pub.join.restricted  = true;
+cmd.priv.join.restricted = true;
 
-    if (notSuperUser(packet.hostmask)) {
-	return;
-    }
+
+
+cmd.pub.part = cmd.priv.part = function (tokens, packet) {
 
     if (tokens[1]) {
 	packet.network.send(irc.outbound.part(tokens[1]));
@@ -133,4 +132,19 @@ cmd.pub.part = cmd.priv.part = function (tokens, packet) {
 	packet.network.send(irc.outbound.part(packet.channel));
     }
 };
+
+cmd.pub.part.restricted  = true;
+cmd.priv.part.restricted = true;
+
+
+
+cmd.pub.ignore = cmd.priv.ignore = function (tokens, packet) {
+
+    packet.ignored[tokens[1]] = true;
+    packet.network.send(irc.outbound.say(packet.sender, 'Ignoring ' + 
+					 tokens[1] + '.'));
+};
+
+cmd.pub.ignore.restricted  = true;
+cmd.priv.ignore.restricted = true;
 
