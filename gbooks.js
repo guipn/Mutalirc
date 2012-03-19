@@ -1,6 +1,6 @@
 var https  = require('https'),
     fs     = require('fs'),
-    utl    = require('./util.js'),
+    interp = require('./util.js').interp,
     gbooks = module.exports;
 
 
@@ -49,28 +49,26 @@ gbooks.getAPIKey = function (filename, callback) {
 
 gbooks.search = function (APIKey, query, callback) {
 
-    var JSONResponse = '',
-	qArg         = query.split(/\s/).join('+'),
-	options      = {
+    var json    = '',
+	options = {
 	    host:   'www.googleapis.com',
 	    method: 'GET',
-	    path:   utl.interp('/books/v1/volumes?q={query}&key={key}' +
-			       '&maxResults=1&printType=books&filter=partial',
-			       {
-				   query: qArg,
-				   key:   APIKey,
-			       })
-	};
-
-    var request = https.request(options, function (response) {
-	response.setEncoding('utf8');
-	response.on('data', function (data) {
-	    JSONResponse += data;
+	    path:   interp('/books/v1/volumes?q={query}&key={key}' +
+			   '&maxResults=1&printType=books&filter=partial',
+			   {
+			       query: query.split(/\s/).join('+'),
+			       key:   APIKey,
+			   })
+	},
+        request = https.request(options, function (response) {
+	    response.setEncoding('utf8');
+	    response.on('data', function (data) {
+		json += data;
+	    });
+	    response.on('end', function () {
+		callback(parse(json));
+	    });
 	});
-	response.on('end', function () {
-	    callback(parse(JSONResponse));
-	});
-    });
 
     request.end();
 };

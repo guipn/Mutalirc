@@ -2,7 +2,6 @@ var nwk = require('./network.js'),
     cfg = require('./config.js'),
     cmd = require('./commands.js'),
     irc = require('./irc.js'),
-    utl = require('./util.js'),
     opt,
     ignored = {};
 
@@ -51,20 +50,26 @@ function react(data) {
 
     } else if ( success = text.match(queries.privmsg(opt.nick)) ) {
 
-	handlePrivate({
-	    hostmask: success[2],
+	handleMessage({
 	    sender:   success[1],
-	    message:  success[3]
-	});
+	    hostmask: success[2],
+	    message:  success[3],
+	    network:  nwk,
+	    options:  opt,
+	    ignored:  ignored
+	}, cmd.prv);
 
     } else if ( success = text.match(queries.publicmsg()) ) {
 
-	handlePublic({
-	    channel:  success[3],
-	    hostmask: success[2],
+	handleMessage({
 	    sender:   success[1],
-	    message:  success[4]
-	});
+	    hostmask: success[2],
+	    channel:  success[3],
+	    message:  success[4],
+	    network:  nwk,
+	    options:  opt,
+	    ignored:  ignored
+	}, cmd.pub);
 
     } 
 
@@ -72,36 +77,13 @@ function react(data) {
 }
 
 
-function handlePrivate(packet) {
+function handleMessage(packet, dispatcher) {
 
     if (ignoring(packet.sender) || ignoring(packet.hostmask)) {
 	console.log('Ignoring query from ' + packet.hostmask);
 	return;
     }
-
-    packet.network = nwk;
-    packet.options = opt;
-    packet.ignored = ignored;
-
-    cmd.dispatch(packet, cmd.prv);
-}
-
-
-function handlePublic(packet) {
-
-    if (ignoring(packet.sender) || ignoring(packet.hostmask)) {
-	console.log(utl.interp('Ignoring message from {hmask} on {chan}.',
-			       {
-				   hmask: packet.hostmask,
-				   chan:  packet.channel
-			       }));
-	return;
-    }
-
-    packet.network = nwk;
-    packet.options = opt;
-    packet.ignored = ignored;
     
-    cmd.dispatch(packet, cmd.pub);
-
+    cmd.dispatch(packet, dispatcher); 
 }
+
