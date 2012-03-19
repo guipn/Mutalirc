@@ -7,7 +7,7 @@ var irc      = require('./irc.js'),
 
 cmd.prefix = /^\./;
 cmd.pub    = {};
-cmd.priv   = {};
+cmd.prv   = {};
 
 
 function tokenize(msg) {
@@ -37,7 +37,7 @@ cmd.dispatch = function (packet, dispatcher) {
 
 
 
-cmd.priv.auth = function (tokens, packet) {
+cmd.prv.auth = function (tokens, packet) {
 
     var correctPass = packet.options.operators[packet.sender];
     
@@ -60,7 +60,7 @@ cmd.priv.auth = function (tokens, packet) {
     }
 };
 
-cmd.priv.auth.restricted = false;
+cmd.prv.auth.restricted = false;
 
 
 
@@ -120,7 +120,7 @@ cmd.pub.rfc.restricted = false;
 
 
 
-cmd.priv.rfc = function(tokens, packet) {
+cmd.prv.rfc = function(tokens, packet) {
     
     tokens.shift();
     rfc.search(tokens.join(' '), function (link) {
@@ -130,11 +130,11 @@ cmd.priv.rfc = function(tokens, packet) {
     });
 };
 
-cmd.priv.rfc.restricted = false;
+cmd.prv.rfc.restricted = false;
 
 
 
-cmd.pub.quit = cmd.priv.quit = function (tokens, packet) {
+cmd.pub.quit = cmd.prv.quit = function (tokens, packet) {
 
     var quitmsg = tokens[1] || "";
 
@@ -148,18 +148,18 @@ cmd.pub.quit.restricted = true;
 
 
 
-cmd.pub.join = cmd.priv.join = function (tokens, packet) {
+cmd.pub.join = cmd.prv.join = function (tokens, packet) {
 
     packet.network.send(irc.outbound.join(tokens[1]));
 
 };
 
 cmd.pub.join.restricted  = true;
-cmd.priv.join.restricted = true;
+cmd.prv.join.restricted = true;
 
 
 
-cmd.pub.part = cmd.priv.part = function (tokens, packet) {
+cmd.pub.part = cmd.prv.part = function (tokens, packet) {
 
     if (tokens[1]) {
 	packet.network.send(irc.outbound.part(tokens[1]));
@@ -170,11 +170,11 @@ cmd.pub.part = cmd.priv.part = function (tokens, packet) {
 };
 
 cmd.pub.part.restricted  = true;
-cmd.priv.part.restricted = true;
+cmd.prv.part.restricted = true;
 
 
 
-cmd.pub.ignore = cmd.priv.ignore = function (tokens, packet) {
+cmd.pub.ignore = cmd.prv.ignore = function (tokens, packet) {
 
     packet.ignored[tokens[1]] = true;
     packet.network.send(irc.outbound.say(packet.sender, 'Ignoring ' + 
@@ -182,5 +182,5 @@ cmd.pub.ignore = cmd.priv.ignore = function (tokens, packet) {
 };
 
 cmd.pub.ignore.restricted  = true;
-cmd.priv.ignore.restricted = true;
+cmd.prv.ignore.restricted = true;
 

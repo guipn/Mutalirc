@@ -79,7 +79,7 @@ function handlePrivate(packet) {
     packet.options = opt;
     packet.ignored = ignored;
 
-    cmd.dispatch(packet, cmd.priv);
+    cmd.dispatch(packet, cmd.prv);
 }
 
 
