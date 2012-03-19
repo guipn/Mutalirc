@@ -2,6 +2,7 @@ var nwk = require('./network.js'),
     cfg = require('./config.js'),
     cmd = require('./commands.js'),
     irc = require('./irc.js'),
+    utl = require('./util.js'),
     opt,
     ignored = {};
 
@@ -84,8 +85,11 @@ function handlePrivate(packet) {
 function handlePublic(packet) {
 
     if (isIgnored(packet.sender) || isIgnored(packet.hostmask)) {
-	console.log('Ignoring message from ' + packet.hostmask +
-		    ' on ' + packet.channel);
+	console.log(utl.interp('Ignoring message from {hmask} on {chan}.',
+			       {
+				   hmask: packet.hostmask,
+				   chan:  packet.channel
+			       }));
 	return;
     }
 

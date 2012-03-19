@@ -1,4 +1,5 @@
-var irc = exports;
+var interp = require('./util.js').interp,
+    irc    = exports;
 
 
 // Some of the regex below must be mapped as 
@@ -12,15 +13,14 @@ irc.inbound = {
 	       },
 
     version:   function (nick) {
-                   return "^:(\\S+)!(\\S+@\\S+)\\sPRIVMSG\\s" + 
-			  nick                                + 
-			  ":.?VERSION.?";
+		   return interp('^:(\\S+)!(\\S+@\\S+)\\sPRIVMSG\\s{nck}' +
+			         '\\s:.?VERSION.?',
+				 { nck: nick });
 	       },
 
     privmsg:   function (nick) {
-	           return "^:(\\S+)!(\\S+@\\S+)\\sPRIVMSG\\s" +
-			  nick                                + 
-			  "\\s:(.+)";
+		   return interp('^:(\\S+)!(\\S+@\\S+)\\sPRIVMSG\\s{nck}\\s:(.+)',
+				 { nck: nick });
 	       },
 
     publicmsg: function () {
@@ -33,33 +33,47 @@ irc.inbound = {
 irc.outbound = {
 
     nick:    function (nick) {
-		 return 'NICK ' + nick + '\r\n';
+		 return interp('NICK {nck}\r\n', { nck: nick });
 	     },
 
     profile: function (nick, owner) {
-		 return 'USER '      + nick  + ' ' + nick + 
-			' unknown :' + owner + '\r\n';
+		 return interp('USER {nck} {nck} unknown :{own}\r\n',
+				{
+				    nck: nick,
+				    own: owner
+				});
 	     },
 
     join:    function (channel) {
-		 return 'JOIN ' + channel + '\r\n';
+		 return interp('JOIN {ch}\r\n', { ch: channel });
+	     },
+
+    part:    function (channel) {
+		 return interp('PART {ch}\r\n', { ch: channel });
 	     },
 
     say:     function (destination, message) {
-	         return 'PRIVMSG ' + destination + ' :' + message + '\r\n';
+		 return interp('PRIVMSG {dst} :{msg}\r\n', 
+			       {
+				   dst: destination,
+				   msg: message
+			       });
 	     },
     
     ping:    function (data) {
-	         return 'PONG :' + data + '\r\n';
+	         return interp('PONG :{dt}\r\n', { dt: data });
 	     },
 
     version: function (requester, version) {
-		 return 'NOTICE ' + requester + ' :VERSION ' +
-			version   + '\r\n';
+		 return interp('NOTICE {req} :VERSION {ver}\r\n',
+			       {
+				   req: requester,
+				   ver: version
+			       });
 	     },
 
     quit:    function (msg) {
-		 return 'QUIT :' + msg + '\r\n';
+		 return interp('QUIT : {msg}\r\n', { msg: msg });
 	     }
 
 };

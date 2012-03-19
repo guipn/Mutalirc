@@ -1,5 +1,6 @@
 var irc      = require('./irc.js'),
     gbk      = require('./gbooks.js'),
+    utl      = require('./util.js'),
     cmd      = exports,
     authdOps = {};
 
@@ -65,13 +66,17 @@ cmd.pub.gbooks = function (tokens, packet) {
 
     function sendBookResult(book) {
 	var msg = book ? 
-		'"'        + book.title                 + '"' +
-		' - '      + book.authors.join(', ')          +
-		'; '       + book.pageCount      + ' pages; ' +
-		'Rating: ' + book.avgRating                   +
-		' ('       + book.ratingsCount + ' ratings).' +
-		' '        + book.link + '.' 
-		: 'No results found on Google Books.';
+		utl.interp('"{title}" - {authors}; Rating: {rating} ' +
+			   '({ratings}); {pages} pages; {link}',
+			    {
+				title:   book.title, 
+				authors: book.authors.join(', '),
+				rating:  book.avgRating, 
+				ratings: book.ratingsCount,
+				pages:   book.pageCount, 
+				link:    book.link
+			    }) :
+		'No results found on Google Books.';
 
 	packet.network.send(
 	    irc.outbound.say(packet.channel, packet.sender + ': ' + msg)
@@ -103,5 +108,29 @@ cmd.pub.quit = cmd.priv.quit = function (tokens, packet) {
     packet.network.send(irc.outbound.quit(quitmsg));
     process.exit();
     console.log(e.message);
+};
+
+cmd.pub.join = cmd.priv.join = function (tokens, packet) {
+
+    if (notSuperUser(packet.hostmask)) {
+	return;
+    }
+
+    packet.network.send(irc.outbound.join(tokens[1]));
+
+};
+
+cmd.pub.part = cmd.priv.part = function (tokens, packet) {
+
+    if (notSuperUser(packet.hostmask)) {
+	return;
+    }
+
+    if (tokens[1]) {
+	packet.network.send(irc.outbound.part(tokens[1]));
+    }
+    else if (packet.channel) {
+	packet.network.send(irc.outbound.part(packet.channel));
+    }
 };
 

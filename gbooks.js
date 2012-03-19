@@ -1,5 +1,6 @@
 var https  = require('https'),
     fs     = require('fs'),
+    utl    = require('./util.js'),
     gbooks = module.exports;
 
 
@@ -53,9 +54,12 @@ gbooks.search = function (APIKey, query, callback) {
 	options      = {
 	    host:   'www.googleapis.com',
 	    method: 'GET',
-	    path:   '/books/v1/volumes?q=' + qArg +
-		    '&key='                + APIKey + 
-		    '&maxResults=1&printType=books&filter=partial'
+	    path:   utl.interp('/books/v1/volumes?q={query}&key={key}' +
+			       '&maxResults=1&printType=books&filter=partial',
+			       {
+				   query: qArg,
+				   key:   APIKey,
+			       })
 	};
 
     var request = https.request(options, function (response) {
