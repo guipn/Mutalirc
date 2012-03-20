@@ -154,7 +154,7 @@ cmd.pub.join = cmd.prv.join = function (tokens, packet) {
 
 };
 
-cmd.pub.join.restricted  = true;
+cmd.pub.join.restricted = true;
 cmd.prv.join.restricted = true;
 
 
@@ -169,7 +169,7 @@ cmd.pub.part = cmd.prv.part = function (tokens, packet) {
     }
 };
 
-cmd.pub.part.restricted  = true;
+cmd.pub.part.restricted = true;
 cmd.prv.part.restricted = true;
 
 
@@ -181,6 +181,34 @@ cmd.pub.ignore = cmd.prv.ignore = function (tokens, packet) {
 					 tokens[1] + '.'));
 };
 
-cmd.pub.ignore.restricted  = true;
+cmd.pub.ignore.restricted = true;
 cmd.prv.ignore.restricted = true;
 
+
+
+cmd.pub.unignore = cmd.prv.unignore = function (tokens, packet) {
+    delete(packet.ignored[tokens[1]]);
+
+    packet.network.send(
+	    irc.outbound.say(
+		packet.sender, 
+    		tokens[1] + ' is no longer being ignored.'
+	    )
+    );
+};
+
+cmd.pub.unignore.restricted = true;
+cmd.prv.unignore.restricted = true;
+
+
+
+cmd.prv.say = function (tokens, packet) {
+
+    var where = tokens[1],
+	what  = tokens[2];
+
+    packet.network.send(irc.outbound.say(where, what));
+
+};
+
+cmd.prv.say.restricted = true;
