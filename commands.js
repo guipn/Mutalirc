@@ -17,7 +17,7 @@ function tokenize(msg) {
 }
 
 
-cmd.dispatch = function (packet, dispatcher) {
+cmd.dispatch = function (dispatcher, packet) {
     
     var tokens = tokenize(packet.message),
 	name   = tokens[0];
@@ -47,7 +47,7 @@ cmd.prv.auth = function (tokens, packet) {
     }
     
     if (tokens[1] !== correctPass) {
-	config.network.send(
+	packet.network.send(
 	    irc.outbound.say(packet.sender, 'Invalid password.')
 	);
     }

@@ -77,4 +77,3 @@ function handleMessage(dispatcher, packet) {
     
     cmd.dispatch(dispatcher, packet); 
 }
-
