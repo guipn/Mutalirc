@@ -20,7 +20,7 @@ function init(options) {
     opt.ignore.forEach(function (nickOrHostmask) {
 	ignored[nickOrHostmask] = true;
     });
- 
+
     nwk.connect(opt, react);
 }
 
@@ -41,7 +41,7 @@ function react(data) {
 
     } else if ( success = text.match(queries.privmsg(opt.nick)) ) {
 
-	handleMessage(cmd.prv, {
+	handleMessage('query', {
 	    sender:   success[1],
 	    hostmask: success[2],
 	    message:  success[3],
@@ -52,7 +52,7 @@ function react(data) {
 
     } else if ( success = text.match(queries.publicmsg()) ) {
 
-	handleMessage(cmd.pub, {
+	handleMessage('public', {
 	    sender:   success[1],
 	    hostmask: success[2],
 	    channel:  success[3],
