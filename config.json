@@ -1,5 +1,5 @@
 {
-    "server": "niven.freenode.net",
+    "server": "irc.freenode.net",
     "port": "6667",
     "nick": "mutalirc",
     "pass": "mutalirc",
