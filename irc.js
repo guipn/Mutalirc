@@ -77,7 +77,7 @@ irc.outbound = {
 	     },
 
     quit:    function (msg) {
-		 return interp('QUIT : {msg}\r\n', { msg: msg });
+		 return interp('QUIT :{msg}\r\n', { msg: msg });
 	     }
 
 };
