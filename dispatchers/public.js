@@ -1,8 +1,8 @@
 var pub = exports,
     irc = require('../irc.js'),
-    rfc = require('../ietf.js'),
     utl = require('../util.js'),
-    gbk = require('../gbooks.js');
+    rfc = require('./modules/ietf.js'),
+    gbk = require('./modules/gbooks.js');
 
 
 

@@ -1,6 +1,6 @@
 var qry = exports,
     irc = require('../irc.js'),
-    rfc = require('../ietf.js');
+    rfc = require('./modules/ietf.js');
 
 
 
