@@ -32,11 +32,15 @@ irc.inbound = {
 
 irc.outbound = {
 
+    pass:    function (password) {
+		 return interp('PASS {pass}\r\n', { pass: password });
+	     },
+
     nick:    function (nick) {
 		 return interp('NICK {nck}\r\n', { nck: nick });
 	     },
 
-    profile: function (nick, owner) {
+    user:    function (nick, owner) {
 		 return interp('USER {nck} {nck} unknown :{own}\r\n',
 				{
 				    nck: nick,

@@ -2,6 +2,7 @@
     "server": "niven.freenode.net",
     "port": "6667",
     "nick": "mutalirc",
+    "pass": "mutalirc",
     "owner": "guidj0s",
     "operators": {
 	"guidj0s": "test"

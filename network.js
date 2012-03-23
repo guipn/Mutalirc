@@ -27,8 +27,9 @@ nwk.connect = function (opt, callback) {
 
 	console.log('Connected.');
 
+	nwk.send(irc.outbound.pass(opt.pass));
 	nwk.send(irc.outbound.nick(opt.nick));
-	nwk.send(irc.outbound.profile(opt.nick, opt.owner));
+	nwk.send(irc.outbound.user(opt.nick, opt.owner));
 
 	opt.channels.forEach(function (channel) {
 	    console.log('Joining channel ' + channel);
