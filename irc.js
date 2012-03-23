@@ -48,8 +48,12 @@ irc.outbound = {
 				});
 	     },
 
-    join:    function (channel) {
-		 return interp('JOIN {ch}\r\n', { ch: channel });
+    join:    function (channel, pass) {
+		 return interp('JOIN {ch} {key}\r\n', 
+				{ 
+				    ch: channel,
+				    key: pass ? pass : ''
+				});
 	     },
 
     part:    function (channel) {
