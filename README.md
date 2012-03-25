@@ -15,7 +15,7 @@ My IRC bot for node.js.
  * Simple RFC searching.
 
 
-## Important Concepts
+## Key Concepts
 
 ### Dispatchers
 
@@ -29,7 +29,7 @@ These are objects that determine the bot's behavior that depends on IRC messages
 cmd[dispatcher][tokens[0]](tokens, context);
 </pre>
 
-The structure above is purposefully verbose, if cluttered, so as to show the overall mechanism at work. The [actual implementation] [commands.js] uses more names to hide the ugly syntax.
+The structure above is purposefully verbose, if cluttered, so as to show the overall mechanism at work. The [actual implementation] [commands] uses more names to hide the ugly syntax.
 
 Every function exposed by a dispatcher (thus, every command) should have a *restricted* property set to either true or false. Only authenticated users cause dispatch to actually occur. 
 
