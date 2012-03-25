@@ -23,11 +23,13 @@ These are objects that determine the bot's behavior that depends on IRC messages
 
 <pre>
 // Assuming 'cmd' is the object exported by commands.js,
-// and that tokens is an array of tokens parsed from an IRC
+// and that 'tokens' is an array of tokens parsed from an IRC
 // messsage:
 
 cmd[dispatcher][tokens[0]](tokens, packet);
 </pre>
+
+The structure above is purposefully verbose, if cluttered, so as to show the overall mechanism at work. The [actual implementation] [commands.js] uses more names to hide the ugly syntax.
 
 [public]: https://github.com/guipn/mutalirc/blob/master/dispatchers/public.js
 
