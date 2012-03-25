@@ -25,10 +25,11 @@ cmd.load = function (dispatcher, context) {
 }
 
 
-cmd.dispatch = function (dispatcher, context) {
+cmd.dispatch = function (context) {
 
-    var tokens = tokenize(context.message),
-	name   = tokens[0],
+    var tokens     = tokenize(context.message),
+	name       = tokens[0],
+	dispatcher = context.dispatcher,
 	commandFun;
 
     context.authd = authd;

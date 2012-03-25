@@ -3,7 +3,7 @@ var nwk = require('./network.js'),
     cmd = require('./commands.js'),
     irc = require('./irc.js'),
     opt,
-    ignored = {};
+    ignored   = {};
 
 
 // Entry point
@@ -24,56 +24,79 @@ function init(options) {
     nwk.connect(opt, react);
 }
 
+
+function getmatch(target, tries) {
+
+    var test, i;
+
+    for (i = 0; i < tries.length; i++) {
+	if (test = target.match(tries[i])) {
+	    return test[0];
+	}
+    }
+
+    return 'unknown';
+}
+
+
 function react(data) {
 
     var text    = data.toString(),
 	queries = irc.inbound,
 	resp    = irc.outbound,
-	success;
-
-    if ( success = text.match(queries.ping()) ) {
-
-	nwk.send(resp.ping(success[1])); 
-
-    } else if ( success = text.match(queries.version(opt.nick)) ) {
-	
-	nwk.send(resp.version(success[1], opt.version)); 
-
-    } else if ( success = text.match(queries.privmsg(opt.nick)) ) {
-
-	handleMessage('query', {
-	    sender:   success[1],
-	    hostmask: success[2],
-	    message:  success[3],
-	    network:  nwk,
-	    options:  opt,
-	    ignored:  ignored
-	});
-
-    } else if ( success = text.match(queries.publicmsg()) ) {
-
-	handleMessage('public', {
-	    sender:   success[1],
-	    hostmask: success[2],
-	    channel:  success[3],
-	    message:  success[4],
-	    network:  nwk,
-	    options:  opt,
-	    ignored:  ignored
-	});
-
-    } 
+	action,
+	reactions;
 
     console.log(text);
-}
 
+    reactions = {
 
-function handleMessage(dispatcher, context) {
+	PING:    function (text) {
+		     var matches = text.match(queries.ping());
+		     nwk.send(resp.ping(matches[1]));
+	         },
 
-    if (ignoring(context.sender) || ignoring(context.hostmask)) {
-	console.log('Ignoring query from ' + context.hostmask);
-	return;
+	VERSION: function (text) {
+		     var matches = text.match(queries.privmsg(opt.nick));
+		     nwk.send(resp.version(matches[1], opt.version));
+		 },
+
+	PRIVMSG: function (text) {
+		     var matches,
+			 context = {
+			    network:  nwk,
+			    options:  opt,
+			    ignored:  ignored
+			 };
+
+		     if (matches = text.match(queries.privmsg(opt.nick))) {
+			 context.message    = matches[3];
+			 context.dispatcher = 'query';
+		     }
+		     else if (matches = text.match(queries.publicmsg())) {
+			 context.channel    = matches[3];
+			 context.message    = matches[4];
+			 context.dispatcher = 'public';
+		     }
+		     else {
+			 return;
+		     }
+
+		     context.sender   = matches[1];
+		     context.hostmask = matches[2];
+
+		     if (ignoring(context.sender) || ignoring(context.hostmask)) {
+			 console.log('Ignoring message from ' + context.hostmask);
+			 return;
+		     }
+
+		     cmd.dispatch(context);
+		 }
+    };
+
+    action = getmatch(text, Object.getOwnPropertyNames(reactions));
+
+    if (typeof reactions[action] !== 'undefined') {
+	reactions[action](text);
     }
-    
-    cmd.dispatch(dispatcher, context); 
 }
