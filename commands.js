@@ -12,9 +12,9 @@ function tokenize(msg) {
 }
 
 
-cmd.load = function (dispatcher, packet) {
+cmd.load = function (dispatcher, context) {
 
-    var dispatcherFile = packet.options.dispatcherDir + 
+    var dispatcherFile = context.options.dispatcherDir + 
 			 '/' + dispatcher + '.js',
 	absolutePath = require.resolve(dispatcherFile);
 
@@ -25,17 +25,17 @@ cmd.load = function (dispatcher, packet) {
 }
 
 
-cmd.dispatch = function (dispatcher, packet) {
+cmd.dispatch = function (dispatcher, context) {
 
-    var tokens = tokenize(packet.message),
+    var tokens = tokenize(context.message),
 	name   = tokens[0],
 	commandFun;
 
-    packet.authd = authd;
-    packet.cmd   = cmd;
+    context.authd = authd;
+    context.cmd   = cmd;
  
     if (typeof cmd[dispatcher] === 'undefined') {
-	cmd.load(dispatcher, packet);
+	cmd.load(dispatcher, context);
     }
 
     commandFun = cmd[dispatcher][name];
@@ -45,10 +45,10 @@ cmd.dispatch = function (dispatcher, packet) {
     }
 
     if (commandFun.restricted === false) {
-	commandFun(tokens, packet);
+	commandFun(tokens, context);
     } 
-    else if (typeof authd[packet.hostmask] !== 'undefined') {
-	commandFun(tokens, packet);
+    else if (typeof authd[context.hostmask] !== 'undefined') {
+	commandFun(tokens, context);
     }
 
 };

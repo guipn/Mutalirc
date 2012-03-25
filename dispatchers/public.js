@@ -6,9 +6,9 @@ var pub = exports,
 
 
 
-pub.gbooks = function (tokens, packet) {
+pub.gbooks = function (tokens, context) {
 
-    var opt = packet.options;
+    var opt = context.options;
 
     function sendBookResult(book) {
 	var msg = book ? 
@@ -24,8 +24,8 @@ pub.gbooks = function (tokens, packet) {
 			    }) :
 		'No results found on Google Books.';
 
-	packet.network.send(
-	    irc.outbound.say(packet.channel, packet.sender + ': ' + msg)
+	context.network.send(
+	    irc.outbound.say(context.channel, context.sender + ': ' + msg)
 	);	
     }
 
@@ -41,19 +41,19 @@ pub.gbooks.restricted = true;
 
 
 
-pub.rfc = function(tokens, packet) {
+pub.rfc = function(tokens, context) {
     
     tokens.shift();
     rfc.search(tokens.join(' '), function (link) {
 
 	var msg = utl.interp('{who}: {lnk}',
 			     {
-				 who: packet.sender,
+				 who: context.sender,
 				 lnk: link
 			     });
 
-	packet.network.send(
-	    irc.outbound.say(packet.channel, msg)
+	context.network.send(
+	    irc.outbound.say(context.channel, msg)
 	);
     });
 };
@@ -62,12 +62,12 @@ pub.rfc.restricted = false;
 
 
 
-pub.quit = function (tokens, packet) {
+pub.quit = function (tokens, context) {
 
     var quitmsg = tokens[1] || "";
 
-    console.log('Quitting by order of ' + packet.sender);
-    packet.network.send(irc.outbound.quit(quitmsg));
+    console.log('Quitting by order of ' + context.sender);
+    context.network.send(irc.outbound.quit(quitmsg));
     process.exit();
     console.log(e.message);
 };
@@ -76,9 +76,9 @@ pub.quit.restricted = true;
 
 
 
-pub.join = function (tokens, packet) {
+pub.join = function (tokens, context) {
 
-    packet.network.send(irc.outbound.join(tokens[1]));
+    context.network.send(irc.outbound.join(tokens[1]));
 
 };
 
@@ -86,13 +86,13 @@ pub.join.restricted = true;
 
 
 
-pub.part = function (tokens, packet) {
+pub.part = function (tokens, context) {
 
     if (tokens[1]) {
-	packet.network.send(irc.outbound.part(tokens[1]));
+	context.network.send(irc.outbound.part(tokens[1]));
     }
-    else if (packet.channel) {
-	packet.network.send(irc.outbound.part(packet.channel));
+    else if (context.channel) {
+	context.network.send(irc.outbound.part(context.channel));
     }
 };
 
@@ -100,10 +100,10 @@ pub.part.restricted = true;
 
 
 
-pub.ignore = function (tokens, packet) {
+pub.ignore = function (tokens, context) {
 
-    packet.ignored[tokens[1]] = true;
-    packet.network.send(irc.outbound.say(packet.sender, 'Ignoring ' + 
+    context.ignored[tokens[1]] = true;
+    context.network.send(irc.outbound.say(context.sender, 'Ignoring ' + 
 					 tokens[1] + '.'));
 };
 
@@ -111,12 +111,12 @@ pub.ignore.restricted = true;
 
 
 
-pub.unignore = function (tokens, packet) {
-    delete(packet.ignored[tokens[1]]);
+pub.unignore = function (tokens, context) {
+    delete(context.ignored[tokens[1]]);
 
-    packet.network.send(
+    context.network.send(
 	    irc.outbound.say(
-		packet.sender, 
+		context.sender, 
     		tokens[1] + ' is no longer being ignored.'
 	    )
     );

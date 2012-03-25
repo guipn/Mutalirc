@@ -4,12 +4,12 @@ var qry = exports,
 
 
 
-qry.load = function (tokens, packet) {
+qry.load = function (tokens, context) {
 
-    packet.cmd.load(tokens[1], packet);
+    context.cmd.load(tokens[1], context);
 
-    packet.network.send(
-	irc.outbound.say(packet.sender,
+    context.network.send(
+	irc.outbound.say(context.sender,
 			 'Dispatcher loaded.')
     );
 
@@ -19,25 +19,25 @@ qry.load.restricted = true;
 
 
 
-qry.auth = function (tokens, packet) {
+qry.auth = function (tokens, context) {
 
-    var correctPass = packet.options.operators[packet.sender];
+    var correctPass = context.options.operators[context.sender];
     
-    if (typeof packet.options.
-	    operators[packet.sender] === 'undefined') {
+    if (typeof context.options.
+	    operators[context.sender] === 'undefined') {
 	return;
     }
     
     if (tokens[1] !== correctPass) {
-	packet.network.send(
-	    irc.outbound.say(packet.sender, 'Invalid password.')
+	context.network.send(
+	    irc.outbound.say(context.sender, 'Invalid password.')
 	);
     }
     else {
-	packet.authd[packet.hostmask] = true;
+	context.authd[context.hostmask] = true;
 
-	packet.network.send(
-	    irc.outbound.say(packet.sender, 'You are now authentified.')
+	context.network.send(
+	    irc.outbound.say(context.sender, 'You are now authentified.')
 	);
     }
 };
@@ -46,12 +46,12 @@ qry.auth.restricted = false;
 
 
 
-qry.rfc = function(tokens, packet) {
+qry.rfc = function(tokens, context) {
     
     tokens.shift();
     rfc.search(tokens.join(' '), function (link) {
-	packet.network.send(
-	    irc.outbound.say(packet.sender, link)
+	context.network.send(
+	    irc.outbound.say(context.sender, link)
 	);
     });
 };
@@ -60,9 +60,9 @@ qry.rfc.restricted = false;
 
 
 
-qry.join = function (tokens, packet) {
+qry.join = function (tokens, context) {
 
-    packet.network.send(irc.outbound.join(tokens[1]));
+    context.network.send(irc.outbound.join(tokens[1]));
 
 };
 
@@ -70,13 +70,13 @@ qry.join.restricted = true;
 
 
 
-qry.part = function (tokens, packet) {
+qry.part = function (tokens, context) {
 
     if (tokens[1]) {
-	packet.network.send(irc.outbound.part(tokens[1]));
+	context.network.send(irc.outbound.part(tokens[1]));
     }
-    else if (packet.channel) {
-	packet.network.send(irc.outbound.part(packet.channel));
+    else if (context.channel) {
+	context.network.send(irc.outbound.part(context.channel));
     }
 };
 
@@ -84,12 +84,12 @@ qry.part.restricted = true;
 
 
 
-qry.quit = function (tokens, packet) {
+qry.quit = function (tokens, context) {
 
     var quitmsg = tokens[1] || "";
 
-    console.log('Quitting by order of ' + packet.sender);
-    packet.network.send(irc.outbound.quit(quitmsg));
+    console.log('Quitting by order of ' + context.sender);
+    context.network.send(irc.outbound.quit(quitmsg));
     process.exit();
     console.log(e.message);
 };
@@ -98,10 +98,10 @@ qry.quit.restricted = true;
 
 
 
-qry.ignore = function (tokens, packet) {
+qry.ignore = function (tokens, context) {
 
-    packet.ignored[tokens[1]] = true;
-    packet.network.send(irc.outbound.say(packet.sender, 'Ignoring ' + 
+    context.ignored[tokens[1]] = true;
+    context.network.send(irc.outbound.say(context.sender, 'Ignoring ' + 
 					 tokens[1] + '.'));
 };
 
@@ -109,12 +109,12 @@ qry.ignore.restricted = true;
 
 
 
-qry.unignore = function (tokens, packet) {
-    delete(packet.ignored[tokens[1]]);
+qry.unignore = function (tokens, context) {
+    delete(context.ignored[tokens[1]]);
 
-    packet.network.send(
+    context.network.send(
 	    irc.outbound.say(
-		packet.sender, 
+		context.sender, 
     		tokens[1] + ' is no longer being ignored.'
 	    )
     );
@@ -124,12 +124,12 @@ qry.unignore.restricted = true;
 
 
 
-qry.say = function (tokens, packet) {
+qry.say = function (tokens, context) {
 
     var where = tokens[1],
 	what  = tokens[2];
 
-    packet.network.send(irc.outbound.say(where, what));
+    context.network.send(irc.outbound.say(where, what));
 
 };
 

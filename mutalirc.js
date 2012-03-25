@@ -68,12 +68,12 @@ function react(data) {
 }
 
 
-function handleMessage(dispatcher, packet) {
+function handleMessage(dispatcher, context) {
 
-    if (ignoring(packet.sender) || ignoring(packet.hostmask)) {
-	console.log('Ignoring query from ' + packet.hostmask);
+    if (ignoring(context.sender) || ignoring(context.hostmask)) {
+	console.log('Ignoring query from ' + context.hostmask);
 	return;
     }
     
-    cmd.dispatch(dispatcher, packet); 
+    cmd.dispatch(dispatcher, context); 
 }
