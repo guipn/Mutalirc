@@ -33,8 +33,15 @@ The structure above is purposefully verbose, if cluttered, so as to show the ove
 
 Every function exposed by a dispatcher (thus, every command) should have a *restricted* property set to either true or false. Only authenticated users cause dispatch to actually occur. 
 
+
+### Modules
+
+Modules may be used to provide additional functionality to mutalirc that is not strictly IRC-related. They are usually interfaces to external APIs. An example is [ietf.js] [ietf], which allows the bot to search for RFCs.
+
 [public]: https://github.com/guipn/mutalirc/blob/master/dispatchers/public.js
 
 [query]: https://github.com/guipn/mutalirc/blob/master/dispatchers/query.js
 
 [commands]: https://github.com/guipn/mutalirc/blob/master/commands.js
+
+[iet]: https://github.com/guipn/mutalirc/blob/master/dispatchers/modules/ietf.js
