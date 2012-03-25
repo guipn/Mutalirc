@@ -44,4 +44,4 @@ Modules may be used to provide additional functionality to mutalirc that is not 
 
 [commands]: https://github.com/guipn/mutalirc/blob/master/commands.js
 
-[iet]: https://github.com/guipn/mutalirc/blob/master/dispatchers/modules/ietf.js
+[ietf]: https://github.com/guipn/mutalirc/blob/master/dispatchers/modules/ietf.js
