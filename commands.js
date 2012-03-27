@@ -25,6 +25,13 @@ cmd.load = function (dispatcher, context) {
 }
 
 
+cmd.unload = function (dispatcher) {
+
+    return delete cmd[dispatcher];
+
+};
+
+
 cmd.dispatch = function (context) {
 
     var tokens     = tokenize(context.message),

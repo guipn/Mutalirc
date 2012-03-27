@@ -1,6 +1,14 @@
 var qry = exports,
     irc = require('../irc.js'),
-    rfc = require('./modules/ietf.js');
+    rfc = require('./modules/ietf.js'),
+    interp = require('../util.js').interp;
+
+
+function reply(context, message) {
+    context.network.send(
+	irc.outbound.say(context.sender, message)
+    );
+}
 
 
 
@@ -8,14 +16,27 @@ qry.load = function (tokens, context) {
 
     context.cmd.load(tokens[1], context);
 
-    context.network.send(
-	irc.outbound.say(context.sender,
-			 'Dispatcher loaded.')
+    reply(context, 
+	interp('Dispatcher \'{d}\' loaded.', { d: tokens[1] })
     );
-
 };
 
 qry.load.restricted = true;
+
+
+
+qry.unload = function (tokens, context) {
+
+    reply(context,
+	interp('Dispatcher \'{disp}\' {result}loaded.',
+	       {
+		   disp:   tokens[1],
+		   result: context.cmd.unload(tokens[1]) ? 'un' : 'was not '
+	       })
+    );
+};
+
+qry.unload.restricted = true;
 
 
 
@@ -29,16 +50,11 @@ qry.auth = function (tokens, context) {
     }
     
     if (tokens[1] !== correctPass) {
-	context.network.send(
-	    irc.outbound.say(context.sender, 'Invalid password.')
-	);
+	reply(context, 'Invalid password.');
     }
     else {
 	context.authd[context.hostmask] = true;
-
-	context.network.send(
-	    irc.outbound.say(context.sender, 'You are now authentified.')
-	);
+	reply(context, 'You are now authentified.');
     }
 };
 
@@ -50,9 +66,7 @@ qry.rfc = function(tokens, context) {
     
     tokens.shift();
     rfc.search(tokens.join(' '), function (link) {
-	context.network.send(
-	    irc.outbound.say(context.sender, link)
-	);
+	reply(context, link);
     });
 };
 
@@ -101,8 +115,9 @@ qry.quit.restricted = true;
 qry.ignore = function (tokens, context) {
 
     context.ignored[tokens[1]] = true;
-    context.network.send(irc.outbound.say(context.sender, 'Ignoring ' + 
-					 tokens[1] + '.'));
+    reply(context,
+	interp('Ignoring {who}.', { who: tokens[1] })
+    );
 };
 
 qry.ignore.restricted = true;
@@ -112,11 +127,8 @@ qry.ignore.restricted = true;
 qry.unignore = function (tokens, context) {
     delete(context.ignored[tokens[1]]);
 
-    context.network.send(
-	    irc.outbound.say(
-		context.sender, 
-    		tokens[1] + ' is no longer being ignored.'
-	    )
+    reply(context,
+	interp('{target} unignored.', { target: tokens[1] })
     );
 };
 

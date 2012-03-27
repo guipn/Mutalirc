@@ -1,8 +1,25 @@
 var pub = exports,
     irc = require('../irc.js'),
-    utl = require('../util.js'),
     rfc = require('./modules/ietf.js'),
-    gbk = require('./modules/gbooks.js');
+    gbk = require('./modules/gbooks.js'),
+    interp = require('../util.js').interp;
+
+
+function reply(context, message) {
+    context.network.send(
+	irc.outbound.say(context.channel, 
+			 context.sender + ': ' + message)
+    );
+}
+
+
+function replyQuery(context, message) {
+    context.network.send(
+	irc.outbound.say(context.sender, message)
+    );
+}
+
+
 
 
 
@@ -12,7 +29,7 @@ pub.gbooks = function (tokens, context) {
 
     function sendBookResult(book) {
 	var msg = book ? 
-		utl.interp('"{title}" - {authors}; Rating: {rating} ' +
+		interp('"{title}" - {authors}; Rating: {rating} ' +
 			   '({ratings}); {pages} pages; {link}',
 			    {
 				title:   book.title, 
@@ -24,9 +41,7 @@ pub.gbooks = function (tokens, context) {
 			    }) :
 		'No results found on Google Books.';
 
-	context.network.send(
-	    irc.outbound.say(context.channel, context.sender + ': ' + msg)
-	);	
+	reply(context, msg);
     }
 
     tokens.shift();
@@ -45,16 +60,7 @@ pub.rfc = function(tokens, context) {
     
     tokens.shift();
     rfc.search(tokens.join(' '), function (link) {
-
-	var msg = utl.interp('{who}: {lnk}',
-			     {
-				 who: context.sender,
-				 lnk: link
-			     });
-
-	context.network.send(
-	    irc.outbound.say(context.channel, msg)
-	);
+	reply(context, link);
     });
 };
 
@@ -69,7 +75,6 @@ pub.quit = function (tokens, context) {
     console.log('Quitting by order of ' + context.sender);
     context.network.send(irc.outbound.quit(quitmsg));
     process.exit();
-    console.log(e.message);
 };
 
 pub.quit.restricted = true;
@@ -103,8 +108,8 @@ pub.part.restricted = true;
 pub.ignore = function (tokens, context) {
 
     context.ignored[tokens[1]] = true;
-    context.network.send(irc.outbound.say(context.sender, 'Ignoring ' + 
-					 tokens[1] + '.'));
+
+    replyQuery(context, interp('Ignoring {who}.', { who: tokens[1] }));
 };
 
 pub.ignore.restricted = true;
@@ -113,13 +118,36 @@ pub.ignore.restricted = true;
 
 pub.unignore = function (tokens, context) {
     delete(context.ignored[tokens[1]]);
-
-    context.network.send(
-	    irc.outbound.say(
-		context.sender, 
-    		tokens[1] + ' is no longer being ignored.'
-	    )
-    );
+    replyQuery(context, 
+	       interp('{target} unignored.', { target: tokens[1] }));
 };
 
 pub.unignore.restricted = true;
+
+
+
+pub.load = function (tokens, context) {
+
+    context.cmd.load(tokens[1], context);
+
+    reply(context, 
+	interp('Dispatcher \'{d}\' loaded.', { d: tokens[1] })
+    );
+};
+
+pub.load.restricted = true;
+
+
+
+pub.unload = function (tokens, context) {
+
+    reply(context,
+	interp('Dispatcher \'{disp}\' {result}loaded.',
+	       {
+		   disp:   tokens[1],
+		   result: context.cmd.unload(tokens[1]) ? 'un' : 'was not '
+	       })
+    );
+};
+
+pub.unload.restricted = true;
