@@ -1,6 +1,6 @@
-var irc      = require('./irc.js'),
-    cmd      = exports,
-    authd    = {}; // People authentified
+var irc   = require('./irc.js'),
+    cmd   = exports,
+    authd = {}; // People authentified
 
 cmd.prefix = /^\./;
 

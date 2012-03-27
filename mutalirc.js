@@ -3,7 +3,7 @@ var nwk = require('./network.js'),
     cmd = require('./commands.js'),
     irc = require('./irc.js'),
     opt,
-    ignored   = {};
+    ignored = {};
 
 
 // Entry point
