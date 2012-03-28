@@ -1,5 +1,6 @@
-var irc   = require('./irc.js'),
-    cmd   = exports,
+var cmd   = exports,
+    fs    = require('fs'),
+    irc   = require('./irc.js'),
     authd = {}; // People authentified
 
 cmd.prefix = /^\./;
@@ -16,12 +17,10 @@ cmd.load = function (dispatcher, context) {
 
     var dispatcherFile = context.options.dispatcherDir + 
 			 '/' + dispatcher + '.js',
-	absolutePath = require.resolve(dispatcherFile);
+	absolutePath   = require.resolve(dispatcherFile);
 
     delete require.cache[absolutePath];
-    
     cmd[dispatcher] = require(dispatcherFile);
-
 }
 
 

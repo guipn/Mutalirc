@@ -13,12 +13,17 @@ function reply(context, message) {
 
 
 qry.load = function (tokens, context) {
-
-    context.cmd.load(tokens[1], context);
-
-    reply(context, 
-	interp('Dispatcher \'{d}\' loaded.', { d: tokens[1] })
-    );
+    try {
+	context.cmd.load(tokens[1], context);
+	reply(context, 
+	    interp('Dispatcher \'{d}\' loaded.', { d: tokens[1] })
+	);
+    }
+    catch (e) {
+	reply(context,
+	    interp('Error trying to load dispatcher \'{d}\'.', { d: tokens[1] })
+	);
+    }
 };
 
 qry.load.restricted = true;
