@@ -3,13 +3,16 @@ var cmd   = exports,
     irc   = require('./irc.js'),
     authd = {}; // People authentified
 
-cmd.prefix = /^\./;
+cmd.prefix = '.';
 
 
 function tokenize(msg) {
 
-    return msg.slice(1).split(/\s/);
+    var ret = msg.split(/\s/),
+	fst = ret.shift();
 
+    return (fst === cmd.prefix) ? ret : undefined;
+    
 }
 
 
@@ -33,11 +36,15 @@ cmd.unload = function (dispatcher) {
 
 cmd.dispatch = function (context) {
 
-    var tokens     = tokenize(context.message),
-	name       = tokens[0],
-	dispatcher = context.dispatcher,
+    var dispatcher = context.dispatcher,
+	tokens     = tokenize(context.message),
+	name,
 	commandFun;
 
+    if (tokens) {
+	name = tokens[0];
+    }
+    
     context.authd = authd;
     context.cmd   = cmd;
  
