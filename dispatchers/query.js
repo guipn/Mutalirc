@@ -1,18 +1,26 @@
 var qry    = exports,
     irc    = require('../irc.js'),
     rfc    = require('./modules/ietf.js'),
+    log    = require('./log.js'),
     interp = require('../util.js').interp;
 
 
 function reply(context, message) {
+
     context.network.send(
 	irc.outbound.say(context.sender, message)
     );
+
+    log.query({
+	sender:  context.sender,
+	message: message
+    });
 }
 
 
 
 qry.load = function (tokens, context) {
+
     try {
 	context.cmd.load(tokens[1], context);
 	reply(context, 
@@ -107,7 +115,7 @@ qry.quit = function (tokens, context) {
 
     var quitmsg = tokens[1] || "";
 
-    console.log('-- Quitting by order of ' + context.sender);
+    log.debug('Quitting by order of ' + context.sender);
     context.network.send(irc.outbound.quit(quitmsg));
     process.exit();
 };

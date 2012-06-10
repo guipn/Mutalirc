@@ -1,6 +1,7 @@
 var cmd   = exports,
     fs    = require('fs'),
     irc   = require('./irc.js'),
+    log   = require('./log.js'),
     authd = {}; // People authentified
 
 cmd.prefix = '.';
@@ -18,6 +19,8 @@ function tokenize(msg) {
 
 cmd.load = function (dispatcherName, context) {
 
+    log.debug('Loading dispatcher ' + dispatcherName + '.');
+
     var dispatcherFile = context.options.dispatcherDir + 
 			 '/' + dispatcherName + '.js',
 	absolutePath   = require.resolve(dispatcherFile);
@@ -29,6 +32,7 @@ cmd.load = function (dispatcherName, context) {
 
 cmd.unload = function (dispatcherName) {
 
+    log.debug('Unloading dispatcher ' + dispatcherName + '.');
     return delete cmd[dispatcherName];
 
 };
@@ -55,6 +59,8 @@ cmd.dispatch = function (context) {
     commandFunc = cmd[dispatcher][name];
    
     if (typeof commandFunc === 'undefined') {
+	log.debug('Command "' + name + 
+		  '" not found on dispatcher ' + dispatcherName);
 	return;
     }
 

@@ -2,6 +2,7 @@ var nwk = require('./network.js'),
     cfg = require('./config.js'),
     cmd = require('./commands.js'),
     irc = require('./irc.js'),
+    log = require('./log.js'),
     opt,
     ignored = {};
 
@@ -20,6 +21,8 @@ function init(options) {
 	ignored[nickOrHostmask] = true;
     });
 
+    log.setDir(opt.logDir);
+
     nwk.connect(opt, react);
 }
 
@@ -33,10 +36,12 @@ function react(data) {
 
 	case 'ping':
 	    nwk.send(resp.pong(parsed.content));
+	    log.debug('PONG: ' + parsed.content);
 	    break;
 
 	case 'version':
 	    nwk.send(resp.version(parsed.requester, opt.version));
+	    log.debug('Providing version information to: ' + parsed.requester);
 	    break;
 
 	case 'privmsg':
@@ -52,7 +57,7 @@ function react(data) {
 		};
 
 		if (ignoring(parsed.sender) || ignoring(parsed.hostmask))) {
-		    console.log('-- Ignoring query from ' + parsed.hostmask);
+		    log.debug('Ignoring query from ' + parsed.hostmask);
 		    return;
 		}
 		
@@ -73,7 +78,7 @@ function react(data) {
 		};
 
 		if (ignoring(parsed.sender) || ignoring(parsed.hostmask))) {
-		    console.log('-- Ignoring message from ' + parsed.hostmask);
+		    log.debug('Ignoring message from ' + parsed.hostmask);
 		    return;
 		}
 		

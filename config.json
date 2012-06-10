@@ -10,4 +10,5 @@
     "ignore":        ["punk", "phunk"],
     "gBooksAPIKey":  "gbk",
     "dispatcherDir": "./dispatchers"
+    "logDir":        "./logs"
 }

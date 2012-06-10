@@ -2,6 +2,7 @@ var pub    = exports,
     irc    = require('../irc.js'),
     rfc    = require('./modules/ietf.js'),
     gbk    = require('./modules/gbooks.js'),
+    log    = require('./log.js'),
     interp = require('../util.js').interp;
 
 
@@ -10,6 +11,12 @@ function reply(context, message) {
 	irc.outbound.say(context.channel, 
 			 context.sender + ': ' + message)
     );
+
+    log.publicmsg({
+	channel: context.channel,
+	message: message,
+	sender:  context.sender
+    });
 }
 
 
@@ -17,6 +24,11 @@ function replyQuery(context, message) {
     context.network.send(
 	irc.outbound.say(context.sender, message)
     );
+
+    log.query({
+	message: message,
+	sender:  context.sender
+    });
 }
 
 
@@ -72,7 +84,7 @@ pub.quit = function (tokens, context) {
 
     var quitmsg = tokens[1] || "";
 
-    console.log('-- Quitting by order of ' + context.sender);
+    log.debug('Quitting by order of ' + context.sender);
     context.network.send(irc.outbound.quit(quitmsg));
     process.exit();
 };
