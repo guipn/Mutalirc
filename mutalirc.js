@@ -72,7 +72,7 @@ function react(data) {
 		    options:    opt     
 		};
 
-		if (ignoring(parsed.sender || parsed.hostmask)) {
+		if (ignoring(parsed.sender) || ignoring(parsed.hostmask))) {
 		    console.log('-- Ignoring message from ' + parsed.hostmask);
 		    return;
 		}
