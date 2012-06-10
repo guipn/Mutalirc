@@ -72,7 +72,7 @@ pub.quit = function (tokens, context) {
 
     var quitmsg = tokens[1] || "";
 
-    console.log('Quitting by order of ' + context.sender);
+    console.log('-- Quitting by order of ' + context.sender);
     context.network.send(irc.outbound.quit(quitmsg));
     process.exit();
 };

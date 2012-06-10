@@ -6,7 +6,6 @@ var nwk = require('./network.js'),
     ignored = {};
 
 
-// Entry point
 cfg.read(init);
 
 
@@ -25,82 +24,64 @@ function init(options) {
 }
 
 
-function getmatch(target, tries) {
-
-    var test, i;
-
-    for (i = 0; i < tries.length; i++) {
-	if (test = target.match(tries[i])) {
-	    return tries[i];
-	}
-    }
-
-    return 'unknown';
-}
-
-
 function react(data) {
 
-    var text    = data.toString(),
-	queries = irc.inbound,
-	resp    = irc.outbound,
-	action,
-	reactions;
+    var parsed = irc.process(data.toString(), opt),
+	resp   = irc.outbound;
 
-    console.log(text);
+    switch (parsed.ircCmd) {
 
-    reactions = {
+	case 'ping':
+	    nwk.send(resp.pong(parsed.content));
+	    break;
 
-	PING:    function (text) {
-		     var matches = text.match(queries.ping());
-		     if (matches) {
-			 nwk.send(resp.pong(matches[1]));
-		     }
-	         },
+	case 'version':
+	    nwk.send(resp.version(parsed.requester, opt.version));
+	    break;
 
-	VERSION: function (text) {
-		     var matches = text.match(queries.privmsg(opt.nick));
-		     if (matches) {
-			 nwk.send(resp.version(matches[1], opt.version));
-		     }
-		 },
+	case 'privmsg':
+	    void function () {
 
-	PRIVMSG: function (text) {
-		     var matches,
-			 context = {
-			    network:  nwk,
-			    options:  opt,
-			    ignored:  ignored
-			 };
+		var context = {
+		    sender:     parsed.sender,
+		    hostmask:   parsed.hostmask,
+		    message:    parsed.message,
+		    dispatcher: 'query',
+		    network:    nwk,
+		    options:    opt     
+		};
 
-		     if (matches = text.match(queries.privmsg(opt.nick))) {
-			 context.message    = matches[3];
-			 context.dispatcher = 'query';
-		     }
-		     else if (matches = text.match(queries.publicmsg())) {
-			 context.channel    = matches[3];
-			 context.message    = matches[4];
-			 context.dispatcher = 'public';
-		     }
-		     else {
-			 return;
-		     }
+		if (ignoring(parsed.sender || parsed.hostmask)) {
+		    console.log('-- Ignoring query from ' + parsed.hostmask);
+		    return;
+		}
+		
+		cmd.dispatch(context);
+	    }(); 
+	    break;
 
-		     context.sender   = matches[1];
-		     context.hostmask = matches[2];
+	case 'publicmsg':
+	    void function () {
+		var context = {
+		    sender:     parsed.sender,
+		    hostmask:   parsed.hostmask,
+		    channel:    parsed.channel,
+		    message:    parsed.message,
+		    dispatcher: 'public',
+		    network:    nwk,
+		    options:    opt     
+		};
 
-		     if (ignoring(context.sender) || ignoring(context.hostmask)) {
-			 console.log('Ignoring message from ' + context.hostmask);
-			 return;
-		     }
+		if (ignoring(parsed.sender || parsed.hostmask)) {
+		    console.log('-- Ignoring message from ' + parsed.hostmask);
+		    return;
+		}
+		
+		cmd.dispatch(context);
+	    }();
+	    break;
 
-		     cmd.dispatch(context);
-		 }
-    };
-
-    action = getmatch(text, Object.getOwnPropertyNames(reactions));
-
-    if (typeof reactions[action] !== 'undefined') {
-	reactions[action](text);
+	default:
+	    console.log('-- Undefined reaction.');
     }
 }

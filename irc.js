@@ -2,9 +2,57 @@ var interp = require('./util.js').interp,
     irc    = exports;
 
 
-// Some of the regex below must be mapped as 
-// functions. To keep the API consistent, 
-// all will be provided as such.
+irc.process = function (text, config) {
+
+    console.log(text);
+
+    var ircCommands = Object.getOwnPropertyNames(irc.inbound),
+	result = {};
+    
+    ircCommands.forEach(function (ircCommand) {
+
+	var re   = irc.inbound[ircCommand](config.nick),
+	    test = text.match(re);
+
+	if (test === null) {
+	    return;
+	}
+
+	switch (ircCommand) {
+
+	    case 'ping':
+		result = {
+		    content: test[1]
+		}; break;
+
+	    case 'version':
+		result = {
+		    requester: test[1]	
+		}; break;
+
+	    case 'privmsg':
+		result = {
+		    sender:   test[1],
+		    hostmask: test[2],
+		    message:  test[3]
+		}; break;
+
+	    case 'publicmsg':
+		result = {
+		    sender:   test[1],
+		    hostmask: test[2],
+		    channel:  test[3],
+		    message:  test[4]
+		}; break;
+
+	}
+
+	result.ircCmd = ircCommand;
+    });
+
+    return result;
+};
+
 
 irc.inbound = {
 
@@ -27,6 +75,7 @@ irc.inbound = {
 	           return "^:(\\S+)!(\\S+@\\S+)\\sPRIVMSG" +
 			  "\\s([#&][a-zA-Z_0-9]+)\\s:(.+)";
 	       }
+
 };
 
 
@@ -85,3 +134,4 @@ irc.outbound = {
 	     }
 
 };
+

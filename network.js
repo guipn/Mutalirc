@@ -17,7 +17,7 @@ nwk.send = function (text) {
 
 nwk.connect = function (opt, callback) {
 
-    console.log(utl.interp('Connecting to {srv} on port {prt}',
+    console.log(utl.interp('-- Connecting to {srv} on port {prt}',
 			   {
 			       srv: opt.server,
 			       prt: opt.port
@@ -25,7 +25,7 @@ nwk.connect = function (opt, callback) {
 
     server = net.connect(opt.port, opt.server, function () {
 
-	console.log('Connected.');
+	console.log('-- Connected.');
 
 	nwk.send(irc.outbound.pass(opt.pass));
 	nwk.send(irc.outbound.nick(opt.nick));

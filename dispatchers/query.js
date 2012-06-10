@@ -47,8 +47,6 @@ qry.unload.restricted = true;
 
 qry.auth = function (tokens, context) {
 
-    console.log('\nauth called.\n');
-
     var correctPass = context.options.operators[context.sender];
     
     if (typeof context.options.
@@ -109,10 +107,9 @@ qry.quit = function (tokens, context) {
 
     var quitmsg = tokens[1] || "";
 
-    console.log('Quitting by order of ' + context.sender);
+    console.log('-- Quitting by order of ' + context.sender);
     context.network.send(irc.outbound.quit(quitmsg));
     process.exit();
-    console.log(e.message);
 };
 
 qry.quit.restricted = true;
