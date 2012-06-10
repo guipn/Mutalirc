@@ -1,17 +1,39 @@
-var interp = require('./util.js').interp,
-    irc    = exports;
+var interp  = require('./util.js').interp,
+    irc     = exports,
+    inbound = {
+
+	ping:      function () {
+		       return "^PING :(.+)";
+		   },
+
+	version:   function (nick) {
+		       return interp('^:(\\S+)!(\\S+@\\S+)\\sPRIVMSG\\s{nck}' +
+				     '\\s:.?VERSION.?',
+				     { nck: nick });
+		   },
+
+	privmsg:   function (nick) {
+		       return interp('^:(\\S+)!(\\S+@\\S+)\\sPRIVMSG\\s{nck}\\s:(.+)',
+				     { nck: nick });
+		   },
+
+	publicmsg: function () {
+		       return "^:(\\S+)!(\\S+@\\S+)\\sPRIVMSG" +
+			      "\\s([#&][a-zA-Z_0-9]+)\\s:(.+)";
+		   }
+    };
 
 
 irc.process = function (text, config) {
 
     console.log(text);
 
-    var ircCommands = Object.getOwnPropertyNames(irc.inbound),
+    var ircCommands = Object.getOwnPropertyNames(inbound),
 	result = {};
     
     ircCommands.forEach(function (ircCommand) {
 
-	var re   = irc.inbound[ircCommand](config.nick),
+	var re   = inbound[ircCommand](config.nick),
 	    test = text.match(re);
 
 	if (test === null) {
@@ -53,30 +75,6 @@ irc.process = function (text, config) {
     return result;
 };
 
-
-irc.inbound = {
-
-    ping:      function () {
-	           return "^PING :(.+)";
-	       },
-
-    version:   function (nick) {
-		   return interp('^:(\\S+)!(\\S+@\\S+)\\sPRIVMSG\\s{nck}' +
-			         '\\s:.?VERSION.?',
-				 { nck: nick });
-	       },
-
-    privmsg:   function (nick) {
-		   return interp('^:(\\S+)!(\\S+@\\S+)\\sPRIVMSG\\s{nck}\\s:(.+)',
-				 { nck: nick });
-	       },
-
-    publicmsg: function () {
-	           return "^:(\\S+)!(\\S+@\\S+)\\sPRIVMSG" +
-			  "\\s([#&][a-zA-Z_0-9]+)\\s:(.+)";
-	       }
-
-};
 
 
 irc.outbound = {
@@ -134,4 +132,3 @@ irc.outbound = {
 	     }
 
 };
-
