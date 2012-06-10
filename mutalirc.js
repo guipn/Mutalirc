@@ -51,7 +51,7 @@ function react(data) {
 		    options:    opt     
 		};
 
-		if (ignoring(parsed.sender || parsed.hostmask)) {
+		if (ignoring(parsed.sender) || ignoring(parsed.hostmask))) {
 		    console.log('-- Ignoring query from ' + parsed.hostmask);
 		    return;
 		}
