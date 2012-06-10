@@ -47,6 +47,8 @@ qry.unload.restricted = true;
 
 qry.auth = function (tokens, context) {
 
+    console.log('\nauth called.\n');
+
     var correctPass = context.options.operators[context.sender];
     
     if (typeof context.options.

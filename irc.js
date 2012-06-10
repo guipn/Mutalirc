@@ -68,7 +68,7 @@ irc.outbound = {
 			       });
 	     },
     
-    ping:    function (data) {
+    pong:    function (data) {
 	         return interp('PONG :{dt}\r\n', { dt: data });
 	     },
 

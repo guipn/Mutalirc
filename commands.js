@@ -58,11 +58,8 @@ cmd.dispatch = function (context) {
 	return;
     }
 
-    if (commandFun.restricted === false) {
+    if (commandFun.restricted === false ||
+	typeof authd[context.hostmask] !== 'undefined') {
 	commandFun(tokens, context);
     } 
-    else if (typeof authd[context.hostmask] !== 'undefined') {
-	commandFun(tokens, context);
-    }
-
 };

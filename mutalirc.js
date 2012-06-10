@@ -31,7 +31,7 @@ function getmatch(target, tries) {
 
     for (i = 0; i < tries.length; i++) {
 	if (test = target.match(tries[i])) {
-	    return test[0];
+	    return tries[i];
 	}
     }
 
@@ -53,12 +53,16 @@ function react(data) {
 
 	PING:    function (text) {
 		     var matches = text.match(queries.ping());
-		     nwk.send(resp.ping(matches[1]));
+		     if (matches) {
+			 nwk.send(resp.pong(matches[1]));
+		     }
 	         },
 
 	VERSION: function (text) {
 		     var matches = text.match(queries.privmsg(opt.nick));
-		     nwk.send(resp.version(matches[1], opt.version));
+		     if (matches) {
+			 nwk.send(resp.version(matches[1], opt.version));
+		     }
 		 },
 
 	PRIVMSG: function (text) {
