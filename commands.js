@@ -16,20 +16,20 @@ function tokenize(msg) {
 }
 
 
-cmd.load = function (dispatcher, context) {
+cmd.load = function (dispatcherName, context) {
 
     var dispatcherFile = context.options.dispatcherDir + 
-			 '/' + dispatcher + '.js',
+			 '/' + dispatcherName + '.js',
 	absolutePath   = require.resolve(dispatcherFile);
 
     delete require.cache[absolutePath];
-    cmd[dispatcher] = require(dispatcherFile);
+    cmd[dispatcherName] = require(dispatcherFile);
 }
 
 
-cmd.unload = function (dispatcher) {
+cmd.unload = function (dispatcherName) {
 
-    return delete cmd[dispatcher];
+    return delete cmd[dispatcherName];
 
 };
 
@@ -39,7 +39,7 @@ cmd.dispatch = function (context) {
     var dispatcher = context.dispatcher,
 	tokens     = tokenize(context.message),
 	name,
-	commandFun;
+	commandFunc;
 
     if (tokens) {
 	name = tokens[0];
@@ -52,14 +52,14 @@ cmd.dispatch = function (context) {
 	cmd.load(dispatcher, context);
     }
 
-    commandFun = cmd[dispatcher][name];
+    commandFunc = cmd[dispatcher][name];
    
-    if (typeof commandFun === 'undefined') {
+    if (typeof commandFunc === 'undefined') {
 	return;
     }
 
-    if (commandFun.restricted === false ||
+    if (commandFunc.restricted === false ||
 	typeof authd[context.hostmask] !== 'undefined') {
-	commandFun(tokens, context);
+	commandFunc(tokens, context);
     } 
 };
