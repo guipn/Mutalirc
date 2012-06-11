@@ -2,7 +2,7 @@ var pub    = exports,
     irc    = require('../irc.js'),
     rfc    = require('./modules/ietf.js'),
     gbk    = require('./modules/gbooks.js'),
-    log    = require('./log.js'),
+    log    = require('../log.js'),
     interp = require('../util.js').interp;
 
 
@@ -12,10 +12,10 @@ function reply(context, message) {
 			 context.sender + ': ' + message)
     );
 
-    log.publicmsg({
+    log.publicMsgOut({
 	channel: context.channel,
 	message: message,
-	sender:  context.sender
+	sender:  context.options.nick,
     });
 }
 
@@ -25,9 +25,10 @@ function replyQuery(context, message) {
 	irc.outbound.say(context.sender, message)
     );
 
-    log.query({
-	message: message,
-	sender:  context.sender
+    log.queryOut({
+	message:     message,
+	destination: context.sender,
+	sender:      context.options.nick
     });
 }
 

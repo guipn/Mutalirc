@@ -36,12 +36,14 @@ function react(data) {
 
 	case 'ping':
 	    nwk.send(resp.pong(parsed.content));
-	    log.debug('PONG: ' + parsed.content);
+	    log.debug({message: 'PONG: ' + parsed.content});
 	    break;
 
 	case 'version':
 	    nwk.send(resp.version(parsed.requester, opt.version));
-	    log.debug('Providing version information to: ' + parsed.requester);
+	    log.debug({
+		message: 'Providing version information to: ' + parsed.requester
+	    });
 	    break;
 
 	case 'privmsg':
@@ -56,10 +58,17 @@ function react(data) {
 		    options:    opt     
 		};
 
-		if (ignoring(parsed.sender) || ignoring(parsed.hostmask))) {
-		    log.debug('Ignoring query from ' + parsed.hostmask);
+		if (ignoring(parsed.sender) || ignoring(parsed.hostmask)) {
+		    log.debug({
+			message: 'Ignoring query from ' + parsed.hostmask
+		    });
 		    return;
 		}
+
+		log.queryIn({
+		    sender:  context.sender,
+		    message: context.message
+		});
 		
 		cmd.dispatch(context);
 	    }(); 
@@ -77,10 +86,18 @@ function react(data) {
 		    options:    opt     
 		};
 
-		if (ignoring(parsed.sender) || ignoring(parsed.hostmask))) {
-		    log.debug('Ignoring message from ' + parsed.hostmask);
+		if (ignoring(parsed.sender) || ignoring(parsed.hostmask)) {
+		    log.debug({
+			message: 'Ignoring message from ' + parsed.hostmask
+		    });
 		    return;
 		}
+
+		log.publicMsgIn({
+		    message: context.message,
+		    channel: context.channel,
+		    sender:  context.sender
+		});
 		
 		cmd.dispatch(context);
 	    }();

@@ -8,7 +8,7 @@ log.setDir = function (directory) {
 };
 
 
-log.publicmsg = function (params) {
+log.publicMsgOut = function (params) {
     
     var now  = getTime();
 	path = dir + '/'   + params.channel + '.log',
@@ -20,7 +20,29 @@ log.publicmsg = function (params) {
 };
 
 
-log.query = function (params) {
+log.publicMsgIn = function (params) {
+    
+    var now  = getTime();
+	path = dir + '/'   + params.channel + '.log',
+	line = now + '| <' + params.sender  + '> ' + 
+	       params.message + '\n';
+
+    
+    append(path, line);
+};
+
+
+log.queryOut = function (params) {
+
+    var now  = getTime();
+	path = dir + '/'   + params.destination + '.log',
+	line = now + '| <' + params.sender + '> ' + params.message;
+
+    append(path, line);
+};
+
+
+log.queryIn = function (params) {
 
     var now  = getTime();
 	path = dir + '/'   + params.sender + '.log',

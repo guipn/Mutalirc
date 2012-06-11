@@ -19,7 +19,7 @@ function tokenize(msg) {
 
 cmd.load = function (dispatcherName, context) {
 
-    log.debug('Loading dispatcher ' + dispatcherName + '.');
+    log.debug({ message: 'Loading dispatcher ' + dispatcherName + '.' });
 
     var dispatcherFile = context.options.dispatcherDir + 
 			 '/' + dispatcherName + '.js',
@@ -32,7 +32,7 @@ cmd.load = function (dispatcherName, context) {
 
 cmd.unload = function (dispatcherName) {
 
-    log.debug('Unloading dispatcher ' + dispatcherName + '.');
+    log.debug({ message: 'Unloading dispatcher ' + dispatcherName + '.' });
     return delete cmd[dispatcherName];
 
 };
@@ -48,6 +48,9 @@ cmd.dispatch = function (context) {
     if (tokens) {
 	name = tokens[0];
     }
+    else {
+	return;
+    }
     
     context.authd = authd;
     context.cmd   = cmd;
@@ -59,8 +62,10 @@ cmd.dispatch = function (context) {
     commandFunc = cmd[dispatcher][name];
    
     if (typeof commandFunc === 'undefined') {
-	log.debug('Command "' + name + 
-		  '" not found on dispatcher ' + dispatcherName);
+	log.debug({
+	    message: 'Command "' + name + 
+		     '" not found on dispatcher ' + dispatcher
+	});
 	return;
     }
 

@@ -9,6 +9,6 @@
     "channels":      ["#guidj0s"],
     "ignore":        ["punk", "phunk"],
     "gBooksAPIKey":  "gbk",
-    "dispatcherDir": "./dispatchers"
+    "dispatcherDir": "./dispatchers",
     "logDir":        "./logs"
 }

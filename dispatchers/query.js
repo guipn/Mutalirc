@@ -1,7 +1,7 @@
 var qry    = exports,
     irc    = require('../irc.js'),
     rfc    = require('./modules/ietf.js'),
-    log    = require('./log.js'),
+    log    = require('../log.js'),
     interp = require('../util.js').interp;
 
 
@@ -11,9 +11,10 @@ function reply(context, message) {
 	irc.outbound.say(context.sender, message)
     );
 
-    log.query({
-	sender:  context.sender,
-	message: message
+    log.queryOut({
+	destination:  context.sender,
+	sender:       context.options.nick,
+	message:      message
     });
 }
 

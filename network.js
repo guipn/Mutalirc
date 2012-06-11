@@ -18,22 +18,24 @@ nwk.send = function (text) {
 
 nwk.connect = function (opt, callback) {
 
-    log.debug(utl.interp('Connecting to {srv} on port {prt}',
+    log.debug({
+	message: utl.interp('Connecting to {srv} on port {prt}',
 			   {
 			       srv: opt.server,
 			       prt: opt.port
-			   }));
+			   })
+    });
 
     server = net.connect(opt.port, opt.server, function () {
 
-	log.debug('Connected.');
+	log.debug({ message: 'Connected.' });
 
 	nwk.send(irc.outbound.pass(opt.pass));
 	nwk.send(irc.outbound.nick(opt.nick));
 	nwk.send(irc.outbound.user(opt.nick, opt.owner));
 
 	opt.channels.forEach(function (channel) {
-	    log.debug('Joining channel ' + channel);
+	    log.debug({ message: 'Joining channel ' + channel });
 	    nwk.send(irc.outbound.join(channel));
 	});
 
