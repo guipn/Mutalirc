@@ -4,7 +4,18 @@ var fs  = require('fs'),
 
 
 log.setDir = function (directory) {
-    dir = directory;
+
+    if (require('path').existsSync(directory)) {
+	dir = directory;
+    }
+    else {
+	fs.mkdir(directory, null, function () {
+	    console.log('-- Given log directory is invalid and could not ' +
+		        'be created. Will use default.');
+	});
+    }
+
+    
 };
 
 
@@ -13,9 +24,8 @@ log.publicMsgOut = function (params) {
     var now  = getTime();
 	path = dir + '/'   + params.channel + '.log',
 	line = now + '| <' + params.sender  + '> ' + 
-	       params.message + '\n';
+	       params.message;
 
-    
     append(path, line);
 };
 
@@ -25,8 +35,7 @@ log.publicMsgIn = function (params) {
     var now  = getTime();
 	path = dir + '/'   + params.channel + '.log',
 	line = now + '| <' + params.sender  + '> ' + 
-	       params.message + '\n';
-
+	       params.message;
     
     append(path, line);
 };
@@ -105,22 +114,15 @@ function getTime() {
 
 function append(path, line) {
 
-    console.log(line);
-
-/* 
     fs.open(path, 'a', 438, function (err, fd) {
 
-	var buffer;
-
 	if (err) {
-	    console.log('Error trying to log public message.');
-	    return;
+	    console.log('There was a problem opening the log ' + path + '.');
 	}
-
-	buffer = new Buffer('' + line, 'utf8');
-	// writeAll(fd, buffer, 0, buffer.length);
-	// need ' write ' - check node documentation when on the Internet.
+	
+	fs.write(fd, line + '\n', null, 'utf8', function () {
+	    fs.close(fd);
+	});
 
     });
-*/
 }

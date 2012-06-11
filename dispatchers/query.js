@@ -152,9 +152,16 @@ qry.unignore.restricted = true;
 qry.say = function (tokens, context) {
 
     var where = tokens[1],
-	what  = tokens[2];
+	what  = tokens.slice(2).join(' ');
 
+    console.log('Sending ' + what + ' in ' + where);
     context.network.send(irc.outbound.say(where, what));
+
+    log.publicMsgOut({
+	channel: where,
+	message: what,
+	sender:  context.options.nick
+    });
 
 };
 
