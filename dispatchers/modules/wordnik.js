@@ -1,11 +1,12 @@
 var wnk   = module.exports,
     https = require('https'),
     fs    = require('fs'),
-    qs    = require('querystring');
+    qs    = require('querystring'),
+    cache = {};
     
 
 
-function parse(response) {
+function parse(word, response) {
 
     var results = JSON.parse(response),
 	defs    = [];
@@ -14,6 +15,7 @@ function parse(response) {
 	defs.push(result.text);
     });
 
+    cache[word] = defs;
     return defs;
 }
 
@@ -29,6 +31,11 @@ wnk.getAPIKey = function (filename, callback) {
 
 
 wnk.define = function (APIKey, word, callback) {
+
+    if (cache[word]) {
+	callback(cache[word]);
+	return;
+    }
 
     var json    = '',
 	options = {
@@ -48,7 +55,7 @@ wnk.define = function (APIKey, word, callback) {
 		json += data;
 	    });
 	    response.on('end', function () {
-		callback(parse(json));
+		callback(parse(word, json));
 	    });
 	});
 

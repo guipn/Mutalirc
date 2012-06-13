@@ -39,8 +39,6 @@ pub.define = function (tokens, context) {
 
     var opt = context.options;
 
-    console.log(tokens);
-
     function sendDefinition(def) {
 
 	var msg = def.length > 0 ? 
