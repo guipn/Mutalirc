@@ -1,6 +1,6 @@
 # Mutalirc
 
-My IRC bot for node.js. 
+My IRC bot for node.js. This README file explains the implementation.
 
 
 ### Common Funcionalities
@@ -44,9 +44,23 @@ The structure above is purposefully verbose, if cluttered, so as to show the ove
 Every function exposed by a dispatcher (thus, every command) should have a *restricted* property set to either true or false. Only authenticated users cause dispatch to actually occur. 
 
 
+### Context
+
+Context objects are created by the main module and passed on to [commands.js] [commands]. Their purpose is to provide any information needed to carry out whatever processing a dispatcher does (maybe involving additional modules, in which case the dispatcher may augment and/or forward the context object). 
+
+Typical information held by context objects include the sender of a message that was received and the options object containing mutalirc's configuration.
+
+
 ### Modules
 
 Modules may be used to provide additional functionality to mutalirc that is not strictly IRC-related. They are usually interfaces to external APIs. An example is [ietf.js] [ietf], which allows the bot to search for RFCs.
+
+
+### Connectivity
+
+The [network module] [network] is reponsible for the bot's connection to the IRC server with which it speaks. Its most used interface element is *send*. It makes sure the given text ends in `\r\n` (as required by the RFC) and writes to the connection socket. An exported function called *connect* starts a connection based on the current configurations and handles required negotiation with the IRC server. No cryptography is employed.
+
+
 
 [public]: https://github.com/guipn/mutalirc/blob/master/dispatchers/public.js
 
@@ -59,3 +73,5 @@ Modules may be used to provide additional functionality to mutalirc that is not 
 [ircjs]: https://github.com/guipn/mutalirc/blob/master/irc.js
 
 [main]: https://github.com/guipn/mutalirc/blob/master/mutalirc.js
+
+[network]: https://github.com/guipn/mutalirc/blob/master/network.js
