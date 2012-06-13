@@ -2,6 +2,7 @@ var pub    = exports,
     irc    = require('../irc.js'),
     rfc    = require('./modules/ietf.js'),
     gbk    = require('./modules/gbooks.js'),
+    wnk    = require('./modules/wordnik.js'),
     log    = require('../log.js'),
     interp = require('../util.js').interp;
 
@@ -34,6 +35,29 @@ function replyQuery(context, message) {
 
 
 
+pub.define = function (tokens, context) {
+
+    var opt = context.options;
+
+    console.log(tokens);
+
+    function sendDefinition(def) {
+
+	var msg = def.length > 0 ? 
+		    def.join(' ').substr(0, 300) + ' (...)' :
+		    'No results found on Wornidk.';
+
+	reply(context, msg);
+    }
+
+    wnk.getAPIKey(opt.apiKeys.wordnik, function (key) {
+	wnk.define(key, tokens[1], sendDefinition);
+    });
+
+};
+
+pub.define.restricted = true;
+
 
 
 pub.gbooks = function (tokens, context) {
@@ -41,6 +65,7 @@ pub.gbooks = function (tokens, context) {
     var opt = context.options;
 
     function sendBookResult(book) {
+
 	var msg = book ? 
 		interp('"{title}" - {authors}; Rating: {rating} ' +
 			   '({ratings}); {pages} pages; {link}',
@@ -59,7 +84,7 @@ pub.gbooks = function (tokens, context) {
 
     tokens.shift();
 
-    gbk.getAPIKey(opt.gBooksAPIKey, function (key) {
+    gbk.getAPIKey(opt.apiKeys.googleBooks, function (key) {
 	gbk.search(key, tokens.join(' '), sendBookResult);
     });
 

@@ -8,7 +8,10 @@
     "version":       "1.0",
     "channels":      ["#guidj0s"],
     "ignore":        ["punk", "phunk"],
-    "gBooksAPIKey":  "gbk",
+    "apiKeys":       {
+			"googleBooks": "./apiKeys/googleBooks", 
+			"wordnik":     "./apiKeys/wordnik"
+		     },
     "dispatcherDir": "./dispatchers",
     "logDir":        "./logs"
 }
