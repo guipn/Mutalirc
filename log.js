@@ -21,7 +21,7 @@ log.setDir = function (directory) {
 
 log.publicMsgOut = function (params) {
     
-    var now  = getTime();
+    var now  = getTime(),
 	path = dir + '/'   + params.channel + '.log',
 	line = now + '| <' + params.sender  + '> ' + 
 	       params.message;
@@ -32,7 +32,7 @@ log.publicMsgOut = function (params) {
 
 log.publicMsgIn = function (params) {
     
-    var now  = getTime();
+    var now  = getTime(),
 	path = dir + '/'   + params.channel + '.log',
 	line = now + '| <' + params.sender  + '> ' + 
 	       params.message;
@@ -43,7 +43,7 @@ log.publicMsgIn = function (params) {
 
 log.queryOut = function (params) {
 
-    var now  = getTime();
+    var now  = getTime(),
 	path = dir + '/'   + params.destination + '.log',
 	line = now + '| <' + params.sender + '> ' + params.message;
 
@@ -53,7 +53,7 @@ log.queryOut = function (params) {
 
 log.queryIn = function (params) {
 
-    var now  = getTime();
+    var now  = getTime(),
 	path = dir + '/'   + params.sender + '.log',
 	line = now + '| <' + params.sender + '> ' + params.message;
 
@@ -63,7 +63,7 @@ log.queryIn = function (params) {
 
 log.debug = function (params) {
 
-    var now  = getTime();
+    var now  = getTime(),
 	path = './debug.log',
 	line = now + '| ' + params.message;
 
@@ -75,7 +75,7 @@ log.debug = function (params) {
 
 log.joined = function (params) {
 
-    var now  = getTime();
+    var now  = getTime(),
 	path = dir + '/'  + params.channel + '.log',
 	line = now + '| ' + params.who     + ' joined channel ' + 
 	       params.channel + '.';
@@ -86,7 +86,7 @@ log.joined = function (params) {
 
 log.parted = function (params) {
 
-    var now  = getTime(); 
+    var now  = getTime(), 
 	path = dir + '/'  + params.channel + '.log',
 	line = now + '| ' + params.who     + ' parted channel ' +
 	       params.channel + '.';
@@ -97,7 +97,7 @@ log.parted = function (params) {
 
 log.renamed = function (params) {
 
-    var now  = getTime();
+    var now  = getTime(),
 	path = dir + '/'  + params.channel + '.log',
 	line = now + '| ' + params.old     + ' changed nick to ' +
 	       params.new_ + '.';
