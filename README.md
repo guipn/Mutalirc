@@ -41,7 +41,7 @@ cmd[dispatcher][tokens[0]](tokens, context);
 
 The structure above is purposefully verbose, if cluttered, so as to show the overall mechanism at work. The [actual implementation] [commands] uses more names to hide the ugly syntax.
 
-Every function exposed by a dispatcher (thus, every command) should have a *restricted* property set to either true or false. Only authenticated users cause dispatch to actually occur. 
+Every function exposed by a dispatcher (thus, every command) should have a *restricted* property set to either true or false. Only anthentified users cause dispatch to actually occur. 
 
 
 ### Context
