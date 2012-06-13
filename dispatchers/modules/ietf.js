@@ -1,5 +1,5 @@
 var http = require('http'),
-    utl  = require('../../util.js'),
+    qs   = require('querystring'),
     rfc  = exports;
 
 rfc.search = function (query, callback) {
@@ -9,10 +9,10 @@ rfc.search = function (query, callback) {
 	options = {
 	    host: 'www.googlesyndicatedsearch.com',
 	    method: 'GET',
-	    path: utl.interp('/u/ietf?q={q}&Search=Search',
-			      {
-				  q: query.split(/\s/).join('+')
-			      })
+	    path:   '/u/ietf?' +
+		    qs.stringify({
+      			q: query.split(/\s/).join('+')
+		    })
 	},
 	request = http.request(options, function (response) {
 	    response.setEncoding('utf8');
